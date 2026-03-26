@@ -1,5 +1,6 @@
 package com.shipthisinstead.sdk.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -53,13 +54,16 @@ class FeedbackListViewModel(
                     isAuthenticating = state is AuthState.Authenticating,
                 )
                 if (state is AuthState.Authenticated || state is AuthState.Guest) {
+                    // Load boards (branding + board list) once auth resolves so we have a token
+                    if (_uiState.value.boards.isEmpty()) {
+                        loadBoards()
+                    }
                     if (_uiState.value.items.isEmpty() && !_uiState.value.isLoading) {
                         loadInitial()
                     }
                 }
             }
         }
-        loadBoards()
     }
 
     private fun loadBoards() {
@@ -71,7 +75,9 @@ class FeedbackListViewModel(
                     branding = response.branding,
                     isProjectArchived = response.isProjectArchived ?: false,
                 )
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.e("STI", "loadBoards failed: ${e.message}", e)
+            }
         }
     }
 
@@ -95,7 +101,11 @@ class FeedbackListViewModel(
                     isLoading = false,
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false, error = e.message)
+                Log.e("STI", "loadInitial failed: ${e.message}", e)
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Unknown error",
+                )
             }
         }
     }
