@@ -1,55 +1,29 @@
 package com.shipthisinstead.sdk.ui.screens
 
+import androidx.compose.ui.graphics.Color
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shipthisinstead.sdk.R
 import com.shipthisinstead.sdk.models.STIBoard
@@ -81,7 +55,12 @@ fun SubmitFeedbackScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.sti_submit_title)) },
+                title = { 
+                    Text(
+                        stringResource(R.string.sti_submit_title),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -90,6 +69,10 @@ fun SubmitFeedbackScreen(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                )
             )
         },
         modifier = modifier,
@@ -99,8 +82,8 @@ fun SubmitFeedbackScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             // Title field
             OutlinedTextField(
@@ -111,6 +94,11 @@ fun SubmitFeedbackScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 isError = uiState.title.isBlank() && uiState.error != null,
+                shape = MaterialTheme.shapes.large,
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary
+                ),
                 supportingText = if (uiState.title.isBlank() && uiState.error != null) {
                     { Text(stringResource(R.string.sti_submit_title_required)) }
                 } else null,
@@ -130,7 +118,12 @@ fun SubmitFeedbackScreen(
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = boardDropdownExpanded) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .menuAnchor(),
+                        .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true),
+                    shape = MaterialTheme.shapes.large,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
+                    )
                 )
                 ExposedDropdownMenu(
                     expanded = boardDropdownExpanded,
@@ -138,7 +131,7 @@ fun SubmitFeedbackScreen(
                 ) {
                     uiState.boards.forEach { board ->
                         DropdownMenuItem(
-                            text = { Text(board.name) },
+                            text = { Text(board.name, style = MaterialTheme.typography.bodyLarge) },
                             onClick = {
                                 viewModel.selectBoard(board)
                                 boardDropdownExpanded = false
@@ -156,102 +149,123 @@ fun SubmitFeedbackScreen(
                 placeholder = { Text(stringResource(R.string.sti_submit_description_placeholder)) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp),
+                    .height(160.dp),
                 minLines = 4,
-                maxLines = 8,
+                maxLines = 10,
+                shape = MaterialTheme.shapes.large,
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+                    focusedBorderColor = MaterialTheme.colorScheme.primary
+                )
             )
 
             // Attachments section
-            Text(
-                text = stringResource(R.string.sti_submit_attachments_label),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.sti_submit_attachments_label),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                uiState.stagedAttachments.forEach { attachment ->
-                    InputChip(
-                        selected = false,
-                        onClick = {},
-                        label = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                if (attachment.isImage) {
-                                    Icon(
-                                        imageVector = Icons.Default.Image,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(14.dp),
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    uiState.stagedAttachments.forEach { attachment ->
+                        InputChip(
+                            selected = false,
+                            onClick = {},
+                            shape = MaterialTheme.shapes.medium,
+                            label = {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    modifier = Modifier.padding(vertical = 4.dp)
+                                ) {
+                                    if (attachment.isImage) {
+                                        Icon(
+                                            imageVector = Icons.Default.Image,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                    } else {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.InsertDriveFile,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(16.dp),
+                                        )
+                                    }
+                                    Text(
+                                        text = attachment.fileName,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
                                     )
-                                } else {
+                                    if (attachment.isUploading) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(14.dp),
+                                            strokeWidth = 1.5.dp,
+                                        )
+                                    }
+                                }
+                            },
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = { viewModel.removeAttachment(attachment.localUri) },
+                                    modifier = Modifier.size(24.dp),
+                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.InsertDriveFile,
-                                        contentDescription = null,
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.sti_general_remove),
                                         modifier = Modifier.size(14.dp),
                                     )
                                 }
+                            },
+                        )
+                    }
+
+                    if (uiState.stagedAttachments.size < 5) {
+                        AssistChip(
+                            onClick = { attachmentPickerLauncher.launch("*/*") },
+                            shape = MaterialTheme.shapes.medium,
+                            label = {
                                 Text(
-                                    text = attachment.fileName,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
+                                    stringResource(R.string.sti_submit_add_attachment),
+                                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                                 )
-                                if (attachment.isUploading) {
-                                    CircularProgressIndicator(
-                                        modifier = Modifier.size(12.dp),
-                                        strokeWidth = 1.5.dp,
-                                    )
-                                }
-                            }
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { viewModel.removeAttachment(attachment.localUri) },
-                                modifier = Modifier.size(16.dp),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = stringResource(R.string.sti_general_remove),
-                                    modifier = Modifier.size(12.dp),
-                                )
-                            }
-                        },
-                    )
-                }
-
-                if (uiState.stagedAttachments.size < 5) {
-                    FilterChip(
-                        selected = false,
-                        onClick = { attachmentPickerLauncher.launch("*/*") },
-                        label = {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
+                            },
+                            leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.Add,
                                     contentDescription = null,
-                                    modifier = Modifier.size(14.dp),
+                                    modifier = Modifier.size(18.dp),
                                 )
-                                Text(stringResource(R.string.sti_submit_add_attachment))
-                            }
-                        },
-                    )
+                            },
+                            colors = AssistChipDefaults.assistChipColors(
+                                labelColor = MaterialTheme.colorScheme.primary,
+                                leadingIconContentColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
                 }
             }
 
             // Error message
             val error = uiState.error
             if (error != null) {
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.small,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -259,21 +273,28 @@ fun SubmitFeedbackScreen(
             // Submit button
             Button(
                 onClick = { viewModel.submit(onSuccess) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
                 enabled = uiState.canSubmit,
+                shape = MaterialTheme.shapes.large,
+                contentPadding = PaddingValues(horizontal = 24.dp)
             ) {
                 if (uiState.isSubmitting) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
+                        modifier = Modifier.size(20.dp),
                         strokeWidth = 2.dp,
                         color = MaterialTheme.colorScheme.onPrimary,
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
                 }
-                Text(stringResource(R.string.sti_general_submit))
+                Text(
+                    stringResource(R.string.sti_general_submit),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

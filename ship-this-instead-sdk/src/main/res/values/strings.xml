@@ -9,6 +9,7 @@
     <string name="sti_general_send">Send</string>
     <string name="sti_general_submit">Submit</string>
     <string name="sti_general_error">Error</string>
+    <string name="sti_general_error_title">Failed to Load</string>
     <string name="sti_general_ok">OK</string>
     <string name="sti_general_delete">Delete</string>
     <string name="sti_general_remove">Remove</string>
@@ -42,6 +43,7 @@
     <string name="sti_feedback_submit_cta">Submit Feedback</string>
 
     <!-- Feedback Detail -->
+    <string name="sti_feedback_detail_title">Feedback Detail</string>
     <string name="sti_feedback_detail_comments">Comments</string>
     <string name="sti_feedback_detail_no_comments">No comments yet.</string>
     <string name="sti_feedback_detail_by">by</string>

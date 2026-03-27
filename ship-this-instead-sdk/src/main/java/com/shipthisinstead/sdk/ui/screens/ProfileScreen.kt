@@ -1,33 +1,15 @@
 package com.shipthisinstead.sdk.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -42,13 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shipthisinstead.sdk.R
-import com.shipthisinstead.sdk.models.STIComment
-import com.shipthisinstead.sdk.models.STIFeedbackItem
 import com.shipthisinstead.sdk.models.STIUserProfile
-import com.shipthisinstead.sdk.ui.components.AvatarImage
-import com.shipthisinstead.sdk.ui.components.CommentItem
-import com.shipthisinstead.sdk.ui.components.ErrorContent
-import com.shipthisinstead.sdk.ui.components.FeedbackRowItem
+import com.shipthisinstead.sdk.ui.components.*
 import com.shipthisinstead.sdk.ui.viewmodels.ProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,7 +47,12 @@ fun ProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.sti_profile_title)) },
+                title = { 
+                    Text(
+                        stringResource(R.string.sti_profile_title),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -79,6 +61,10 @@ fun ProfileScreen(
                         )
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                )
             )
         },
         modifier = modifier,
@@ -114,32 +100,43 @@ fun ProfileScreen(
                     // Profile header
                     ProfileHeader(profile = profile)
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Stats row
                     ProfileStats(profile = profile)
 
-                    Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider()
-
-                    // Tabs
-                    ScrollableTabRow(
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Tabs - Using Primary color for the row
+                    TabRow(
                         selectedTabIndex = selectedTab,
-                        edgePadding = 0.dp,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.primary,
+                        divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)) },
                     ) {
                         Tab(
                             selected = selectedTab == 0,
                             onClick = { selectedTab = 0 },
-                            text = { Text(stringResource(R.string.sti_profile_tabs_requests)) },
+                            text = { 
+                                Text(
+                                    stringResource(R.string.sti_profile_tabs_requests),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium)
+                                ) 
+                            },
                         )
                         Tab(
                             selected = selectedTab == 1,
                             onClick = { selectedTab = 1 },
-                            text = { Text(stringResource(R.string.sti_profile_tabs_comments)) },
+                            text = { 
+                                Text(
+                                    stringResource(R.string.sti_profile_tabs_comments),
+                                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium)
+                                ) 
+                            },
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Tab content
                     when (selectedTab) {
@@ -149,13 +146,13 @@ fun ProfileScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(32.dp),
+                                        .padding(48.dp),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = "No requests yet",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                     )
                                 }
                             } else {
@@ -163,9 +160,8 @@ fun ProfileScreen(
                                     FeedbackRowItem(
                                         item = item,
                                         onClick = { onFeedbackClick(item.id) },
-                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                     )
-                                    HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                                 }
                             }
                         }
@@ -175,30 +171,30 @@ fun ProfileScreen(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(32.dp),
+                                        .padding(48.dp),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = "No comments yet",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                     )
                                 }
                             } else {
                                 Column(
-                                    modifier = Modifier.padding(16.dp),
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                                     verticalArrangement = Arrangement.spacedBy(16.dp),
                                 ) {
                                     commentList.forEach { comment ->
                                         CommentItem(comment = comment)
-                                        HorizontalDivider()
+                                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
                                     }
                                 }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(48.dp))
                 }
             }
         }
@@ -213,26 +209,33 @@ private fun ProfileHeader(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 24.dp),
+            .padding(top = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AvatarImage(
-            avatarUrl = profile.avatarUrl,
-            displayName = profile.displayName,
-            size = 72.dp,
-        )
-        Spacer(modifier = Modifier.height(12.dp))
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 4.dp,
+            border = null
+        ) {
+            AvatarImage(
+                avatarUrl = profile.avatarUrl,
+                displayName = profile.displayName,
+                size = 80.dp,
+            )
+        }
+        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = profile.displayName,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface
         )
         if (!profile.email.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = profile.email,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )
         }
     }
@@ -247,7 +250,7 @@ private fun ProfileStats(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
     ) {
         StatCard(
             count = profile.count.feedbackItems,
@@ -273,28 +276,26 @@ private fun StatCard(
     label: String,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    Surface(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 12.dp),
+                .padding(vertical = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = count.toString(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )
         }
     }

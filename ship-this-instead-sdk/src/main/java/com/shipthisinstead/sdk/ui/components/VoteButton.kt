@@ -1,18 +1,11 @@
 package com.shipthisinstead.sdk.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,34 +23,36 @@ fun VoteButton(
     modifier: Modifier = Modifier,
 ) {
     val primary = MaterialTheme.colorScheme.primary
-    val tint = if (hasVoted) primary else MaterialTheme.colorScheme.onSurfaceVariant
-    val borderColor = if (hasVoted) primary else MaterialTheme.colorScheme.outline
-    val bgColor = if (hasVoted) primary.copy(alpha = 0.08f) else Color.Transparent
+    val contentColor = if (hasVoted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+    val borderColor = if (hasVoted) primary else MaterialTheme.colorScheme.outlineVariant
+    val bgColor = if (hasVoted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
 
     Surface(
         onClick = onClick,
         modifier = modifier,
         enabled = isEnabled,
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(12.dp),
         color = bgColor,
-        border = BorderStroke(1.dp, borderColor),
+        border = if (hasVoted) null else BorderStroke(1.dp, borderColor),
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
                 contentDescription = null,
-                tint = tint,
-                modifier = Modifier.size(16.dp),
+                tint = contentColor,
+                modifier = Modifier.size(20.dp),
             )
-            Spacer(modifier = Modifier.width(2.dp))
             Text(
                 text = voteCount.toString(),
-                color = tint,
-                fontSize = 13.sp,
-                fontWeight = if (hasVoted) FontWeight.SemiBold else FontWeight.Normal,
+                color = contentColor,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = if (hasVoted) FontWeight.Bold else FontWeight.Medium,
+                    fontSize = 13.sp
+                )
             )
         }
     }

@@ -37,10 +37,10 @@ class MainActivity : ComponentActivity() {
 
         ShipThisInsteadSDK.configure(
             config = ShipThisInsteadConfig(
-                organizationSlug = "your-org-slug",
-                projectSlug = "your-project-slug",
-                environment = STIEnvironment.Development(baseUrl = "http://10.0.2.2:3002"),
-                ssoSecret = "your-sso-secret",
+                organizationSlug = "dewuday",
+                projectSlug = "sti",
+                environment = STIEnvironment.Development(baseUrl = "http://192.168.1.161:3002"),
+                ssoSecret = "r5PJrXUp77GH0JLKwjnD6SXA2yl1mlfprySr6Mx/9i4=",
                 userId = "demo-user-001",
                 userName = "Demo User",
                 userEmail = "demo@example.com",

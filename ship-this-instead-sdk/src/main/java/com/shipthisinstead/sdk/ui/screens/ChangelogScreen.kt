@@ -1,28 +1,14 @@
 package com.shipthisinstead.sdk.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -37,11 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shipthisinstead.sdk.R
 import com.shipthisinstead.sdk.models.STIReleaseNote
-import com.shipthisinstead.sdk.ui.components.EmptyStateContent
-import com.shipthisinstead.sdk.ui.components.ErrorContent
-import com.shipthisinstead.sdk.ui.components.RichTextContent
-import com.shipthisinstead.sdk.ui.components.StatusBadge
-import com.shipthisinstead.sdk.ui.components.relativeTime
+import com.shipthisinstead.sdk.ui.components.*
 import com.shipthisinstead.sdk.ui.viewmodels.ChangelogViewModel
 
 @Composable
@@ -92,8 +74,8 @@ fun ChangelogScreen(
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
                 state = listState,
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 itemsIndexed(uiState.notes, key = { _, note -> note.id }) { _, note ->
                     ChangelogNoteCard(
@@ -114,6 +96,11 @@ fun ChangelogScreen(
                         }
                     }
                 }
+
+                // Add spacing for floating toolbar at the end
+                item {
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
     }
@@ -130,49 +117,53 @@ private fun ChangelogNoteCard(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        shape = MaterialTheme.shapes.medium,
+        border = null
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Version badge + title row
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 val version = note.version
                 if (!version.isNullOrBlank()) {
                     Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
                     ) {
                         Text(
                             text = "v$version",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         )
                     }
                 }
 
                 Text(
                     text = note.title,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp,
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 17.sp
+                    ),
                     modifier = Modifier.weight(1f),
                 )
             }
 
             // Publish date
             val dateStr = note.publishedAt ?: note.createdAt
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(6.dp))
             Text(
                 text = relativeTime(dateStr),
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Content
             RichTextContent(html = note.content)
@@ -180,38 +171,48 @@ private fun ChangelogNoteCard(
             // Linked feedback
             val linked = note.linkedFeedbacks
             if (!linked.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                 Spacer(modifier = Modifier.height(12.dp))
-                HorizontalDivider()
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(R.string.sti_general_changelog_linked_feedback),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 linked.forEach { linkedFeedback ->
                     val item = linkedFeedback.feedbackItem
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
+                    Surface(
+                        onClick = { onFeedbackClick?.invoke(item.id) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 2.dp),
+                            .padding(vertical = 4.dp),
+                        color = Color.Transparent,
+                        shape = MaterialTheme.shapes.small
                     ) {
-                        Text(
-                            text = "#${item.number}",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = item.title,
-                            fontSize = 12.sp,
-                            modifier = Modifier.weight(1f),
-                        )
-                        val status = item.status
-                        if (status != null) {
-                            Spacer(modifier = Modifier.width(6.dp))
-                            StatusBadge(name = status.name, color = status.color)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(vertical = 4.dp),
+                        ) {
+                            Text(
+                                text = "#${item.number}",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = item.title,
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                                modifier = Modifier.weight(1f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            val status = item.status
+                            if (status != null) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                StatusBadge(name = status.name, color = status.color)
+                            }
                         }
                     }
                 }

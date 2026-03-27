@@ -1,53 +1,23 @@
 package com.shipthisinstead.sdk.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shipthisinstead.sdk.R
-import com.shipthisinstead.sdk.ui.components.BoardFilterChips
-import com.shipthisinstead.sdk.ui.components.EmptyStateContent
-import com.shipthisinstead.sdk.ui.components.ErrorContent
-import com.shipthisinstead.sdk.ui.components.FeedbackRowItem
-import com.shipthisinstead.sdk.ui.components.FeedbackRowSkeleton
-import com.shipthisinstead.sdk.ui.components.PoweredByBadge
+import com.shipthisinstead.sdk.ui.components.*
 import com.shipthisinstead.sdk.ui.viewmodels.FeedbackListViewModel
 
 private data class SortOption(val key: String, val labelResId: Int)
@@ -90,50 +60,65 @@ fun FeedbackListScreen(
         ?: stringResource(R.string.sti_feedback_list_sort_newest)
 
     Column(modifier = modifier.fillMaxSize()) {
-        // Board filter chips (only if more than 1 board)
-        if (uiState.boards.size > 1) {
-            BoardFilterChips(
-                boards = uiState.boards,
-                selectedSlug = uiState.selectedBoardSlug,
-                onSelect = viewModel::selectBoard,
-            )
-        }
+        // Board filter chips and Sort row (only if NOT in a global error state)
+        val isErrorState = uiState.error != null && uiState.items.isEmpty()
+        val isInitialLoading = uiState.isLoading && uiState.items.isEmpty()
+        
+        if (!isErrorState && !isInitialLoading && (uiState.items.isNotEmpty() || uiState.boards.size > 1)) {
+            // Board filter chips (only if more than 1 board)
+            if (uiState.boards.size > 1) {
+                BoardFilterChips(
+                    boards = uiState.boards,
+                    selectedSlug = uiState.selectedBoardSlug,
+                    onSelect = viewModel::selectBoard,
+                )
+            }
 
-        // Sort row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            Box {
-                TextButton(
-                    onClick = { showSortMenu = true },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Sort,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = currentSortLabel,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-                DropdownMenu(
-                    expanded = showSortMenu,
-                    onDismissRequest = { showSortMenu = false },
-                ) {
-                    sortOptions.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(stringResource(option.labelResId)) },
-                            onClick = {
-                                viewModel.selectSort(option.key)
-                                showSortMenu = false
-                            },
-                        )
+            // Sort row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Box {
+                    Surface(
+                        onClick = { showSortMenu = true },
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(18.dp),
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = currentSortLabel,
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    }
+                    DropdownMenu(
+                        expanded = showSortMenu,
+                        onDismissRequest = { showSortMenu = false },
+                    ) {
+                        sortOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(option.labelResId)) },
+                                onClick = {
+                                    viewModel.selectSort(option.key)
+                                    showSortMenu = false
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -144,40 +129,39 @@ fun FeedbackListScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 color = MaterialTheme.colorScheme.errorContainer,
-                shape = MaterialTheme.shapes.small,
+                shape = MaterialTheme.shapes.medium,
             ) {
                 Row(
-                    modifier = Modifier.padding(12.dp),
+                    modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(16.dp),
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(R.string.sti_project_archived),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onErrorContainer,
                     )
                 }
             }
         }
 
-        HorizontalDivider()
-
         Box(modifier = Modifier.weight(1f)) {
             when {
                 uiState.isLoading && uiState.items.isEmpty() -> {
                     // Skeleton loading
-                    Column {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
                         repeat(6) {
                             FeedbackRowSkeleton()
-                            HorizontalDivider()
                         }
                     }
                 }
@@ -207,7 +191,8 @@ fun FeedbackListScreen(
                     ) {
                         LazyColumn(
                             state = listState,
-                            contentPadding = PaddingValues(bottom = 80.dp),
+                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             itemsIndexed(
                                 items = uiState.items,
@@ -216,9 +201,7 @@ fun FeedbackListScreen(
                                 FeedbackRowItem(
                                     item = item,
                                     onClick = { onFeedbackClick(item.id) },
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                                 )
-                                HorizontalDivider(modifier = Modifier.padding(horizontal = 8.dp))
                             }
 
                             if (uiState.isLoadingMore) {
@@ -244,32 +227,15 @@ fun FeedbackListScreen(
                 }
             }
 
-            // FAB
-            if (!uiState.isProjectArchived) {
+            // Authentication status indicator (if authenticating)
+            if (uiState.isAuthenticating) {
                 Box(
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(16.dp),
+                        .fillMaxSize()
+                        .padding(bottom = 120.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    when {
-                        uiState.isAuthenticating -> {
-                            CircularProgressIndicator(modifier = Modifier.size(48.dp))
-                        }
-                        uiState.isAuthenticated -> {
-                            FloatingActionButton(
-                                onClick = onSubmitClick,
-                                containerColor = MaterialTheme.colorScheme.primary,
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.sti_feedback_submit_cta),
-                                    tint = MaterialTheme.colorScheme.onPrimary,
-                                )
-                            }
-                        }
-                        // Guest: no FAB
-                        else -> {}
-                    }
+                    CircularProgressIndicator()
                 }
             }
         }
