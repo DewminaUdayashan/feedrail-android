@@ -1,8 +1,6 @@
 package com.shipthisinstead.sdk.ui
 
-import android.content.res.Configuration
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -11,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -31,20 +28,20 @@ fun ShipThisInsteadBottomSheet(
     val langConfig by sdk.languageManager.config.collectAsStateWithLifecycle()
     val layoutDirection = if (langConfig.isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
 
-    // Responsive height: full-screen on landscape, 92 % on portrait
-    val configuration = LocalConfiguration.current
-    val heightFraction = if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) 1f else 0.92f
-
     CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
         ModalBottomSheet(
             onDismissRequest = onDismiss,
             sheetState = sheetState,
-            // Pass empty insets — the Scaffold inside STINavGraph handles its
-            // own insets via contentWindowInsets, so we must not double-apply
-            // the navigation-bar padding here.
+            // Zero the sheet's own insets so we don't double-apply the
+            // navigation-bar height. The Scaffold inside STINavGraph handles
+            // insets explicitly (NavigationBar + contentWindowInsets = 0).
             contentWindowInsets = { WindowInsets(0) },
             dragHandle = null,
-            modifier = Modifier.fillMaxHeight(heightFraction),
+            // Do NOT constrain height on the modifier — applying fillMaxHeight
+            // here interferes with ModalBottomSheet's internal offset-based
+            // slide-up animation and produces a "jumpy" opening. Instead the
+            // content (fillMaxSize on STINavGraph) drives the sheet height,
+            // which ModalBottomSheet naturally caps at the available screen area.
         ) {
             STINavGraph(
                 sdk = sdk,

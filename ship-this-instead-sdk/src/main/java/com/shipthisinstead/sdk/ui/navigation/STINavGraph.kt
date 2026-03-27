@@ -211,7 +211,10 @@ fun STINavGraph(
                 },
                 bottomBar = {
                     if (showBottomBar) {
-                        NavigationBar {
+                        // windowInsets = 0: the ModalBottomSheet already positions
+                        // the sheet above the system nav bar, so NavigationBar must
+                        // not add its own nav-bar bottom padding on top of that.
+                        NavigationBar(windowInsets = WindowInsets(0)) {
                             STITab.entries.forEach { tab ->
                                 val isSelected = currentRoute == tab.route
                                 NavigationBarItem(
