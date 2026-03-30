@@ -22,23 +22,29 @@ fun VoteButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val primary = MaterialTheme.colorScheme.primary
-    val contentColor = if (hasVoted) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
-    val borderColor = if (hasVoted) primary else MaterialTheme.colorScheme.outlineVariant
-    val bgColor = if (hasVoted) MaterialTheme.colorScheme.primaryContainer else Color.Transparent
+    val containerColor = if (hasVoted) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+    }
+    
+    val contentColor = if (hasVoted) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
 
     Surface(
         onClick = onClick,
         modifier = modifier,
         enabled = isEnabled,
-        shape = RoundedCornerShape(12.dp),
-        color = bgColor,
-        border = if (hasVoted) null else BorderStroke(1.dp, borderColor),
+        shape = MaterialTheme.shapes.medium, // Pill-like with M3 medium or large
+        color = containerColor,
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.KeyboardArrowUp,
@@ -46,12 +52,12 @@ fun VoteButton(
                 tint = contentColor,
                 modifier = Modifier.size(20.dp),
             )
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = voteCount.toString(),
                 color = contentColor,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = if (hasVoted) FontWeight.Bold else FontWeight.Medium,
-                    fontSize = 13.sp
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = if (hasVoted) FontWeight.Bold else FontWeight.SemiBold,
                 )
             )
         }

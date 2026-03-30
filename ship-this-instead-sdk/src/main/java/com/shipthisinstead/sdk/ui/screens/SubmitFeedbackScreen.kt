@@ -5,15 +5,15 @@ import androidx.compose.ui.graphics.Color
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,7 +40,7 @@ fun SubmitFeedbackScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var boardDropdownExpanded by remember { mutableStateOf(false) }
+    var showBoardMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(boards) {
         viewModel.setBoards(boards)
@@ -54,26 +54,35 @@ fun SubmitFeedbackScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { 
-                    Text(
-                        stringResource(R.string.sti_submit_title),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                    ) 
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.sti_general_close),
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+            Column {
+                TopAppBar(
+                    title = { 
+                        Text(
+                            stringResource(R.string.sti_submit_title),
+                            style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
+                        ) 
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.sti_general_close),
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                    )
                 )
-            )
+                if (uiState.isSubmitting) {
+                    LinearProgressIndicator(
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary,
+                        trackColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                    )
+                }
+            }
         },
         modifier = modifier,
     ) { paddingValues ->
@@ -82,8 +91,8 @@ fun SubmitFeedbackScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+                .padding(horizontal = 20.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             // Title field
             OutlinedTextField(
@@ -104,39 +113,88 @@ fun SubmitFeedbackScreen(
                 } else null,
             )
 
-            // Board selection
-            ExposedDropdownMenuBox(
-                expanded = boardDropdownExpanded,
-                onExpandedChange = { boardDropdownExpanded = it },
-            ) {
-                OutlinedTextField(
-                    value = uiState.selectedBoard?.name ?: "",
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text(stringResource(R.string.sti_submit_board_label)) },
-                    placeholder = { Text(stringResource(R.string.sti_submit_board_placeholder)) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = boardDropdownExpanded) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(type = MenuAnchorType.PrimaryEditable, enabled = true),
-                    shape = MaterialTheme.shapes.large,
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
-                        focusedBorderColor = MaterialTheme.colorScheme.primary
-                    )
+            // Board selection (Custom Surface instead of Dropdown)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = stringResource(R.string.sti_submit_board_label),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
-                ExposedDropdownMenu(
-                    expanded = boardDropdownExpanded,
-                    onDismissRequest = { boardDropdownExpanded = false },
-                ) {
-                    uiState.boards.forEach { board ->
-                        DropdownMenuItem(
-                            text = { Text(board.name, style = MaterialTheme.typography.bodyLarge) },
-                            onClick = {
-                                viewModel.selectBoard(board)
-                                boardDropdownExpanded = false
-                            },
-                        )
+                Box {
+                    Surface(
+                        onClick = { showBoardMenu = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large,
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            val selectedBoard = uiState.selectedBoard
+                            if (selectedBoard != null) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Surface(
+                                        modifier = Modifier.size(12.dp),
+                                        shape = CircleShape,
+                                        color = Color(android.graphics.Color.parseColor(selectedBoard.color ?: "#CCCCCC"))
+                                    ) {}
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(
+                                        text = selectedBoard.name,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.sti_submit_board_placeholder),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = showBoardMenu,
+                        onDismissRequest = { showBoardMenu = false },
+                        modifier = Modifier.fillMaxWidth(0.9f) // Allow it to be wide
+                    ) {
+                        uiState.boards.forEach { board ->
+                            val isSelected = uiState.selectedBoard?.id == board.id
+                            DropdownMenuItem(
+                                text = {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Surface(
+                                            modifier = Modifier.size(12.dp),
+                                            shape = CircleShape,
+                                            color = Color(android.graphics.Color.parseColor(board.color ?: "#CCCCCC"))
+                                        ) {}
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(
+                                            text = board.name,
+                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    }
+                                },
+                                onClick = {
+                                    viewModel.selectBoard(board)
+                                    showBoardMenu = false
+                                },
+                                trailingIcon = if (isSelected) {
+                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                } else null
+                            )
+                        }
                     }
                 }
             }

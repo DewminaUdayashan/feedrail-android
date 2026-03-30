@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -13,7 +14,9 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.shipthisinstead.sdk.R
@@ -82,14 +85,15 @@ fun FeedbackListScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Spacer(modifier = Modifier.weight(1f))
+                // Sort pill
                 Box {
                     Surface(
                         onClick = { showSortMenu = true },
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                        shape = MaterialTheme.shapes.medium
                     ) {
                         Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
@@ -101,22 +105,33 @@ fun FeedbackListScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = currentSortLabel,
-                                style = MaterialTheme.typography.labelLarge,
+                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
+
                     DropdownMenu(
                         expanded = showSortMenu,
                         onDismissRequest = { showSortMenu = false },
+                        containerColor = MaterialTheme.colorScheme.surface,
                     ) {
                         sortOptions.forEach { option ->
+                            val isSelected = uiState.sortOption == option.key
                             DropdownMenuItem(
-                                text = { Text(stringResource(option.labelResId)) },
+                                text = { 
+                                    Text(
+                                        stringResource(option.labelResId),
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    ) 
+                                },
                                 onClick = {
                                     viewModel.selectSort(option.key)
                                     showSortMenu = false
                                 },
+                                trailingIcon = if (isSelected) {
+                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                } else null
                             )
                         }
                     }

@@ -1,8 +1,8 @@
 package com.shipthisinstead.sdk.ui.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,18 +21,22 @@ fun StatusBadge(
     val resolvedColor = try {
         STIColor(color)
     } catch (e: Exception) {
-        Color(0xFF6366F1)
+        MaterialTheme.colorScheme.primary
     }
 
-    val background = resolvedColor.copy(alpha = 0.15f)
-
-    Text(
-        text = name,
-        color = resolvedColor,
-        fontSize = 11.sp,
-        fontWeight = FontWeight.Medium,
+    Surface(
+        color = resolvedColor.copy(alpha = 0.1f),
+        shape = MaterialTheme.shapes.extraSmall,
         modifier = modifier
-            .background(color = background, shape = RoundedCornerShape(20.dp))
-            .padding(horizontal = 8.dp, vertical = 3.dp),
-    )
+    ) {
+        Text(
+            text = name.uppercase(),
+            color = resolvedColor,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            ),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
+    }
 }

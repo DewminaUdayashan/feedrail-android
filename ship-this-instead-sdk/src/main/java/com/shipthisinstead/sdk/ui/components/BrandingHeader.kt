@@ -39,9 +39,8 @@ fun BrandingHeader(
         } else {
             Text(
                 text = branding?.projectName ?: title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 17.sp,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

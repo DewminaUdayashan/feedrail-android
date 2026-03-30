@@ -44,7 +44,7 @@ fun FeedbackDetailScreen(
                 title = { 
                     Text(
                         text = stringResource(R.string.sti_feedback_detail_title),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     ) 
                 },
                 navigationIcon = {
@@ -130,10 +130,8 @@ fun FeedbackDetailScreen(
                     // Title
                     Text(
                         text = feedback.title,
-                        style = MaterialTheme.typography.headlineSmall.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp,
-                            lineHeight = 30.sp
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.ExtraBold,
                         ),
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -142,13 +140,20 @@ fun FeedbackDetailScreen(
 
                     // Status + Vote row
                     Row(
+                        modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        val status = feedback.status
-                        if (status != null) {
-                            StatusBadge(name = status.name, color = status.color)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            val status = feedback.status
+                            if (status != null) {
+                                StatusBadge(name = status.name, color = status.color)
+                            }
                         }
+                        
                         VoteButton(
                             voteCount = feedback.voteCount,
                             hasVoted = feedback.hasVoted ?: false,
@@ -157,7 +162,7 @@ fun FeedbackDetailScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     // Author info
                     val author = feedback.author
@@ -165,39 +170,39 @@ fun FeedbackDetailScreen(
                         Surface(
                             onClick = { onUserClick(author.id) },
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            shape = MaterialTheme.shapes.medium
+                            shape = MaterialTheme.shapes.large
                         ) {
                             Row(
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                modifier = Modifier.padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 AvatarImage(
                                     avatarUrl = author.avatarUrl,
                                     displayName = author.displayName,
-                                    size = 32.dp,
+                                    size = 40.dp,
                                 )
-                                Spacer(modifier = Modifier.width(12.dp))
+                                Spacer(modifier = Modifier.width(16.dp))
                                 Column {
                                     Text(
                                         text = author.displayName,
-                                        style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                        style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
                                     )
                                     Text(
                                         text = relativeTime(feedback.createdAt),
-                                        style = MaterialTheme.typography.labelSmall,
+                                        style = MaterialTheme.typography.labelMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                                     )
                                 }
                             }
                         }
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
 
                     // Body content
                     val content = feedback.content
                     if (!content.isNullOrBlank()) {
                         RichTextContent(html = content)
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                     }
 
                     // Attachments

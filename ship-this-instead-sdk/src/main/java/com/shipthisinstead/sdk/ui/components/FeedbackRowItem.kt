@@ -24,157 +24,160 @@ fun FeedbackRowItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    ElevatedCard(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.Top,
+        Column(
+            modifier = Modifier.padding(16.dp)
         ) {
-            // Vote button on the left
-            VoteButton(
-                voteCount = item.voteCount,
-                hasVoted = item.hasVoted ?: false,
-                isEnabled = true,
-                onClick = onClick,
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                // Title
-                Text(
-                    text = item.title,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        lineHeight = 22.sp
-                    ),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                )
-
-                // Content preview
-                val plainContent = item.content?.let { stripHtml(it) }
-                if (!plainContent.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = plainContent,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            fontSize = 14.sp,
-                            lineHeight = 20.sp
-                        ),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Board + Status row
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    val board = item.board
-                    if (board != null) {
-                        val defaultBoardColor = MaterialTheme.colorScheme.primary
-                        val boardColor = try {
-                            board.color?.let { STIColor(it) } ?: defaultBoardColor
-                        } catch (e: Exception) {
-                            defaultBoardColor
-                        }
-                        Surface(
-                            color = boardColor.copy(alpha = 0.12f),
-                            shape = CircleShape
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(6.dp)
-                                        .clip(CircleShape)
-                                        .background(boardColor),
-                                )
-                                Text(
-                                    text = board.name,
-                                    style = MaterialTheme.typography.labelSmall.copy(
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = boardColor
-                                    ),
-                                )
-                            }
-                        }
-                    }
-
-                    val status = item.status
-                    if (status != null) {
-                        StatusBadge(name = status.name, color = status.color)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Author + time + comment count row
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    // Board + Status pill row
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        val author = item.author
-                        if (author != null) {
-                            AvatarImage(
-                                avatarUrl = author.avatarUrl,
-                                displayName = author.displayName,
-                                size = 20.dp,
-                            )
-                            Text(
-                                text = author.displayName,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                            Text(
-                                text = "·",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+                        val board = item.board
+                        if (board != null) {
+                            val defaultBoardColor = MaterialTheme.colorScheme.primary
+                            val boardColor = try {
+                                board.color?.let { STIColor(it) } ?: defaultBoardColor
+                            } catch (e: Exception) {
+                                defaultBoardColor
+                            }
+                            Surface(
+                                color = boardColor.copy(alpha = 0.1f),
+                                shape = MaterialTheme.shapes.extraSmall
+                            ) {
+                                Text(
+                                    text = board.name.uppercase(),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        color = boardColor,
+                                        letterSpacing = 0.5.sp
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                                )
+                            }
                         }
-                        Text(
-                            text = relativeTime(item.createdAt),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+
+                        val status = item.status
+                        if (status != null) {
+                            StatusBadge(name = status.name, color = status.color)
+                        }
                     }
 
-                    if (item.commentCount > 0) {
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Title
+                    Text(
+                        text = item.title,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Vote pill
+                VoteButton(
+                    voteCount = item.voteCount,
+                    hasVoted = item.hasVoted ?: false,
+                    isEnabled = true,
+                    onClick = onClick,
+                )
+            }
+
+            // Expanded body if present
+            val plainContent = item.content?.let { stripHtml(it) }
+            if (!plainContent.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = plainContent,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = 12.dp),
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+
+            // Footer metadata
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val author = item.author
+                    if (author != null) {
+                        AvatarImage(
+                            avatarUrl = author.avatarUrl,
+                            displayName = author.displayName,
+                            size = 20.dp,
+                        )
+                        Text(
+                            text = author.displayName,
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Text(
+                            text = "·",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.outline,
+                        )
+                    }
+                    Text(
+                        text = relativeTime(item.createdAt),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                if (item.commentCount > 0) {
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                        shape = MaterialTheme.shapes.extraSmall
+                    ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Outlined.ChatBubbleOutline,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(14.dp),
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(12.dp),
                             )
                             Text(
                                 text = item.commentCount.toString(),
                                 style = MaterialTheme.typography.labelSmall.copy(
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Bold
                                 ),
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

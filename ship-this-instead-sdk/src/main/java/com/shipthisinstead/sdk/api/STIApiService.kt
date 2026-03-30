@@ -35,6 +35,7 @@ interface STIApiService {
     @GET("api/v1/portal/feedback/{id}")
     suspend fun getFeedbackDetail(@Path("id") id: String): STIFeedbackItem
 
+    // TODO: Update to use paginated comments endpoint api/v1/portal/feedback/{id}/comments
     @GET("api/v1/portal/feedback/by-number/{number}")
     suspend fun getFeedbackByNumber(@Path("number") number: Int): STIFeedbackItem
 

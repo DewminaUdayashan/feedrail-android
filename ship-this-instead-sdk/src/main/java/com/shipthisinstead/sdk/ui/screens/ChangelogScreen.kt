@@ -112,14 +112,13 @@ private fun ChangelogNoteCard(
     onFeedbackClick: ((String) -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
+        colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surface,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        shape = MaterialTheme.shapes.medium,
-        border = null
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             // Version badge + title row
@@ -130,14 +129,15 @@ private fun ChangelogNoteCard(
                 val version = note.version
                 if (!version.isNullOrBlank()) {
                     Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                        shape = MaterialTheme.shapes.extraSmall,
+                        color = MaterialTheme.colorScheme.primaryContainer,
                     ) {
                         Text(
                             text = "v$version",
                             style = MaterialTheme.typography.labelMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                letterSpacing = 0.5.sp
                             ),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                         )
@@ -146,20 +146,20 @@ private fun ChangelogNoteCard(
 
                 Text(
                     text = note.title,
-                    style = MaterialTheme.typography.titleMedium.copy(
+                    style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = 17.sp
                     ),
                     modifier = Modifier.weight(1f),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             // Publish date
             val dateStr = note.publishedAt ?: note.createdAt
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = relativeTime(dateStr),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
             )
 
@@ -173,13 +173,13 @@ private fun ChangelogNoteCard(
             if (!linked.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(16.dp))
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.sti_general_changelog_linked_feedback),
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 linked.forEach { linkedFeedback ->
                     val item = linkedFeedback.feedbackItem
                     Surface(
@@ -187,18 +187,18 @@ private fun ChangelogNoteCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        color = Color.Transparent,
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                         shape = MaterialTheme.shapes.small
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(vertical = 4.dp),
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                         ) {
                             Text(
                                 text = "#${item.number}",
-                                style = MaterialTheme.typography.labelSmall,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.primary,
-                                fontWeight = FontWeight.Bold
+                                fontWeight = FontWeight.ExtraBold
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
@@ -206,7 +206,8 @@ private fun ChangelogNoteCard(
                                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
                                 modifier = Modifier.weight(1f),
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             val status = item.status
                             if (status != null) {

@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                 organizationSlug = "dewuday",
                 projectSlug = "sti",
                 environment = STIEnvironment.Development(baseUrl = "http://192.168.1.161:3002"),
-                ssoSecret = "r5PJrXUp77GH0JLKwjnD6SXA2yl1mlfprySr6Mx/9i4=",
+                ssoSecret = "ES10e1Ug5wmegWdg0r3Z/z2MAnuCM13fSfE6KSF+VdM=",
                 userId = "demo-user-001",
                 userName = "Demo User",
                 userEmail = "demo@example.com",
