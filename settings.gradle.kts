@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ShipThisInstead-Android"
+rootProject.name = "FeedRail-Android"
 include(":app")
-include(":ship-this-instead-sdk")
+include(":feedrail-sdk")

@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.shipthisinstead.sdk.android"
+    namespace = "com.feedrail.sdk.android"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.shipthisinstead.sdk.android"
+        applicationId = "com.feedrail.sdk.android"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
@@ -30,6 +30,7 @@ android {
         compose = true
     }
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -39,8 +40,9 @@ android {
 }
 
 dependencies {
-    implementation(project(":ship-this-instead-sdk"))
+    implementation(project(":feedrail-sdk"))
     implementation(libs.androidx.core.ktx)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)
     val composeBom = platform(libs.compose.bom)

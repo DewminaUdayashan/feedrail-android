@@ -1,0 +1,260 @@
+package com.feedrail.sdk.models
+
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+
+// ── User ─────────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailUser(
+    val id: String,
+    val externalId: String? = null,
+    val name: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val email: String? = null,
+    val avatarUrl: String? = null,
+    val isGuest: Boolean? = null,
+    val isPaidCustomer: Boolean? = null,
+    val productId: String? = null,
+) {
+    val displayName: String
+        get() {
+            if (!name.isNullOrBlank()) return name
+            val full = listOfNotNull(firstName, lastName).joinToString(" ")
+            return if (full.isNotBlank()) full else "Anonymous"
+        }
+
+    val isGuestUser: Boolean get() = isGuest ?: false
+    val isPaid: Boolean get() = isPaidCustomer ?: false
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailUserCount(
+    val feedbackItems: Int,
+    val comments: Int,
+    val votes: Int,
+)
+
+/** Profile response — backend flattens user fields at top level alongside _count. */
+@JsonClass(generateAdapter = true)
+data class FeedRailUserProfile(
+    val id: String,
+    val externalId: String? = null,
+    val name: String? = null,
+    val firstName: String? = null,
+    val lastName: String? = null,
+    val email: String? = null,
+    val avatarUrl: String? = null,
+    val isGuest: Boolean? = null,
+    @Json(name = "_count") val count: FeedRailUserCount,
+) {
+    val displayName: String
+        get() {
+            if (!name.isNullOrBlank()) return name
+            val full = listOfNotNull(firstName, lastName).joinToString(" ")
+            return if (full.isNotBlank()) full else "Anonymous"
+        }
+
+    val isGuestUser: Boolean get() = isGuest ?: false
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailUserActivity(
+    val feedback: List<FeedRailFeedbackItem>,
+    val comments: List<FeedRailComment>,
+)
+
+// ── Board ─────────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailBoard(
+    val id: String,
+    val name: String,
+    val slug: String,
+    val color: String? = null,
+)
+
+// ── Status ────────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailStatus(
+    val id: String,
+    val name: String,
+    val color: String,
+    val feedbackItems: List<FeedRailFeedbackItem>? = null,
+)
+
+// ── Attachment ────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailAttachment(
+    val id: String,
+    val fileName: String,
+    val mimeType: String,
+    val fileSize: Int,
+    val url: String,
+    val createdAt: String,
+) {
+    val isImage: Boolean get() = mimeType.startsWith("image/")
+
+    val formattedSize: String
+        get() = when {
+            fileSize < 1024 -> "$fileSize B"
+            fileSize < 1024 * 1024 -> "%.1f KB".format(fileSize / 1024.0)
+            else -> "%.1f MB".format(fileSize / (1024.0 * 1024))
+        }
+}
+
+// ── Comment ───────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailComment(
+    val id: String,
+    val content: String,
+    val isInternal: Boolean? = null,
+    val user: FeedRailUser? = null,
+    val orgUser: FeedRailUser? = null,
+    val attachments: List<FeedRailAttachment>? = null,
+    val replies: List<FeedRailComment>? = null,
+    val feedbackItem: FeedRailReleaseNoteFeedbackItem? = null,
+    val createdAt: String,
+) {
+    val author: FeedRailUser? get() = orgUser ?: user
+    val isVerified: Boolean get() = orgUser != null
+}
+
+// ── Feedback ──────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailFeedbackCount(
+    val votes: Int,
+    val comments: Int? = null,
+)
+
+@JsonClass(generateAdapter = true)
+data class FeedRailFeedbackItem(
+    val id: String,
+    val number: Int,
+    val title: String,
+    val content: String? = null,
+    val isPinned: Boolean = false,
+    val isTeamPost: Boolean = false,
+    val status: FeedRailStatus? = null,
+    val board: FeedRailBoard? = null,
+    val user: FeedRailUser? = null,
+    val orgUser: FeedRailUser? = null,
+    val attachments: List<FeedRailAttachment>? = null,
+    val comments: List<FeedRailComment>? = null,
+    val hasVoted: Boolean? = null,
+    @Json(name = "_count") val count: FeedRailFeedbackCount? = null,
+    val createdAt: String,
+    val updatedAt: String,
+) {
+    val voteCount: Int get() = count?.votes ?: 0
+    val commentCount: Int get() = count?.comments ?: 0
+    val author: FeedRailUser? get() = if (isTeamPost) orgUser else user
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailVoteResponse(
+    val voted: Boolean,
+    val voteCount: Int,
+)
+
+// ── Branding ──────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailBranding(
+    val projectName: String? = null,
+    val accentColor: String? = null,
+    val logoUrl: String? = null,
+    val portalTheme: String? = null,
+    val showPoweredBy: Boolean? = null,
+    val ssoLoginUrl: String? = null,
+    val requiresAuth: Boolean? = null,
+    val allowAttachments: Boolean? = null,
+    /** Whether the host app's [com.feedrail.sdk.public.FeedRailConfig.themeColor] may
+     * override [accentColor]. Gated server-side by the org's plan. */
+    val allowNativeTheme: Boolean? = null,
+    /** Whether guest / anonymous users may post on this plan. */
+    val allowGuestPosting: Boolean? = null,
+) {
+    val resolvedAccentColor: String get() = accentColor ?: "#25A777"
+    val shouldShowPoweredBy: Boolean get() = showPoweredBy ?: true
+    val attachmentsAllowed: Boolean get() = allowAttachments ?: true
+    val allowsNativeTheme: Boolean get() = allowNativeTheme ?: false
+    val guestPostingAllowed: Boolean get() = allowGuestPosting ?: false
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailBoardsResponse(
+    val boards: List<FeedRailBoard>,
+    val branding: FeedRailBranding? = null,
+    val isProjectArchived: Boolean? = null,
+)
+
+// ── Pagination ────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailPaginationMeta(
+    val total: Int,
+    val page: Int,
+    val limit: Int,
+    val totalPages: Int,
+)
+
+// Generic — KotlinJsonAdapterFactory handles this at runtime (KSP codegen can't handle type params)
+data class FeedRailPaginatedResponse<T>(
+    val items: List<T>,
+    val meta: FeedRailPaginationMeta,
+)
+
+// ── Changelog ─────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailReleaseNote(
+    val id: String,
+    val title: String,
+    val content: String,
+    val version: String? = null,
+    val isDraft: Boolean,
+    val publishedAt: String? = null,
+    val createdAt: String,
+    val linkedFeedbacks: List<FeedRailReleaseNoteFeedback>? = null,
+) {
+    val isPublished: Boolean get() = !isDraft
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailReleaseNoteFeedback(
+    val feedbackItem: FeedRailReleaseNoteFeedbackItem,
+) {
+    val id: String get() = feedbackItem.id
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailReleaseNoteFeedbackItem(
+    val id: String,
+    val number: Int,
+    val title: String,
+    val status: FeedRailStatus? = null,
+)
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailAuthResponse(
+    val endUserToken: String? = null,
+    val user: FeedRailUser? = null,
+)
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+
+@JsonClass(generateAdapter = true)
+data class FeedRailUploadResponse(
+    val url: String,
+    val fileName: String,
+    val mimeType: String,
+    val fileSize: Int,
+)

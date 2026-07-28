@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!-- General -->
+    <string name="feedrail_general_loading">Loading…</string>
+    <string name="feedrail_general_retry">Retry</string>
+    <string name="feedrail_general_cancel">Cancel</string>
+    <string name="feedrail_general_close">Close</string>
+    <string name="feedrail_general_done">Done</string>
+    <string name="feedrail_general_send">Send</string>
+    <string name="feedrail_general_submit">Submit</string>
+    <string name="feedrail_general_error">Error</string>
+    <string name="feedrail_general_error_title">Failed to Load</string>
+    <string name="feedrail_general_ok">OK</string>
+    <string name="feedrail_general_delete">Delete</string>
+    <string name="feedrail_general_remove">Remove</string>
+    <string name="feedrail_general_feedback">Feedback</string>
+    <string name="feedrail_general_roadmap">Roadmap</string>
+    <string name="feedrail_general_changelog">Changelog</string>
+    <string name="feedrail_general_loading_more">Loading more…</string>
+    <string name="feedrail_general_all_loaded">All loaded</string>
+    <string name="feedrail_general_error_unknown">Something went wrong. Please try again.</string>
+    <string name="feedrail_general_anonymous">Anonymous</string>
+    <string name="feedrail_general_team_badge">Team</string>
+    <string name="feedrail_general_roadmap_empty">No roadmap items yet</string>
+    <string name="feedrail_general_roadmap_no_items">No items in this status</string>
+    <string name="feedrail_general_changelog_empty">No release notes yet</string>
+    <string name="feedrail_general_changelog_linked_feedback">Linked Feedback</string>
+    <string name="feedrail_general_on">on</string>
+
+    <!-- Feedback List -->
+    <string name="feedrail_feedback_list_empty_title">No feedback yet</string>
+    <string name="feedrail_feedback_list_empty_subtitle">Be the first to share your ideas and suggestions</string>
+    <string name="feedrail_feedback_list_subtitle">Share your ideas and vote on others</string>
+    <string name="feedrail_feedback_list_loading_more">Loading more…</string>
+    <string name="feedrail_feedback_list_error_title">Unable to Load Feedback</string>
+    <string name="feedrail_feedback_list_error_message">Check your connection and try again.</string>
+    <string name="feedrail_feedback_list_filter_all">All</string>
+    <string name="feedrail_feedback_list_sort_newest">Newest</string>
+    <string name="feedrail_feedback_list_sort_oldest">Oldest</string>
+    <string name="feedrail_feedback_list_sort_top">Top Voted</string>
+    <string name="feedrail_feedback_list_sort_comments">Most Comments</string>
+    <string name="feedrail_feedback_list_sort_label">Sort</string>
+    <string name="feedrail_feedback_submit_cta">Submit Feedback</string>
+
+    <!-- Feedback Detail -->
+    <string name="feedrail_feedback_detail_title">Feedback Detail</string>
+    <string name="feedrail_feedback_detail_comments">Comments</string>
+    <string name="feedrail_feedback_detail_no_comments">No comments yet.</string>
+    <string name="feedrail_feedback_detail_by">by</string>
+    <string name="feedrail_feedback_detail_team_badge">Team</string>
+    <string name="feedrail_feedback_detail_attachments">Attachments</string>
+
+    <!-- Voting -->
+    <string name="feedrail_vote_upvote">Upvote</string>
+    <string name="feedrail_vote_voted">Upvoted</string>
+    <string name="feedrail_vote_sign_in_required">Sign in to vote</string>
+
+    <!-- Submit -->
+    <string name="feedrail_submit_title">Submit Feedback</string>
+    <string name="feedrail_submit_title_placeholder">Short, descriptive title</string>
+    <string name="feedrail_submit_title_label">Title</string>
+    <string name="feedrail_submit_board_label">Board</string>
+    <string name="feedrail_submit_board_placeholder">Select a board</string>
+    <string name="feedrail_submit_description_label">Description</string>
+    <string name="feedrail_submit_description_placeholder">Describe your idea or issue in detail…</string>
+    <string name="feedrail_submit_attachments_label">Attachments</string>
+    <string name="feedrail_submit_add_attachment">Add Attachment</string>
+    <string name="feedrail_submit_success">Feedback submitted!</string>
+    <string name="feedrail_submit_uploading">Uploading…</string>
+    <string name="feedrail_submit_title_required">Title is required.</string>
+    <string name="feedrail_submit_board_required">Please select a board.</string>
+
+    <!-- Comments -->
+    <string name="feedrail_comment_placeholder">Write a comment…</string>
+    <string name="feedrail_comment_attach_file">Attach File</string>
+    <string name="feedrail_comment_sign_in_required">Sign in to comment</string>
+
+    <!-- Attachments -->
+    <string name="feedrail_attachment_too_large">File exceeds 10 MB limit.</string>
+    <string name="feedrail_attachment_unsupported_type">File type not supported.</string>
+    <string name="feedrail_attachment_max_files">Maximum 5 attachments allowed.</string>
+    <string name="feedrail_attachment_uploading">Uploading</string>
+    <string name="feedrail_attachment_upload_failed">Upload failed</string>
+    <string name="feedrail_attachment_download">Download</string>
+
+    <!-- Auth -->
+    <string name="feedrail_auth_sign_in">Sign In</string>
+    <string name="feedrail_auth_sign_out">Sign Out</string>
+    <string name="feedrail_auth_guest">Guest</string>
+    <string name="feedrail_auth_guest_mode">Browsing as guest</string>
+    <string name="feedrail_auth_signing_in">Signing in…</string>
+    <string name="feedrail_auth_required">Sign in required</string>
+    <string name="feedrail_auth_required_message">Please sign in to perform this action.</string>
+
+    <!-- Errors -->
+    <string name="feedrail_error_network">Network error. Check your connection.</string>
+    <string name="feedrail_error_server">Server error. Please try again later.</string>
+    <string name="feedrail_error_unauthorized">Session expired. Please sign in again.</string>
+    <string name="feedrail_error_feature_not_allowed">This feature is not available on your plan.</string>
+    <string name="feedrail_error_rate_limited">Too many requests. Please wait a moment.</string>
+    <string name="feedrail_error_unknown">Something went wrong. Please try again.</string>
+
+    <!-- Powered By -->
+    <string name="feedrail_powered_by">Powered by FeedRail</string>
+
+    <!-- Archived -->
+    <string name="feedrail_project_archived">This board is paused</string>
+    <string name="feedrail_project_archived_message">Not accepting new feedback right now. Check back later.</string>
+
+    <!-- Profile -->
+    <string name="feedrail_profile_title">Profile</string>
+    <string name="feedrail_profile_stats_requests">Requests</string>
+    <string name="feedrail_profile_stats_comments">Comments</string>
+    <string name="feedrail_profile_stats_votes">Votes</string>
+    <string name="feedrail_profile_tabs_requests">Requests</string>
+    <string name="feedrail_profile_tabs_comments">Comments</string>
+    <string name="feedrail_copied_to_clipboard">Copied to clipboard</string>
+
+    <!-- Settings / Language -->
+    <string name="feedrail_settings_language">Language</string>
+    <string name="feedrail_settings_language_title">Select Language</string>
+</resources>
