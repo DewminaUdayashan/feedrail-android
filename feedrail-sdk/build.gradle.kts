@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.feedrail"
-version = "0.1.0"
+version = "0.1.2"
 
 android {
     namespace = "com.feedrail.sdk"
@@ -53,7 +53,11 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.feedrail"
             artifactId = "feedrail-sdk"
-            version = "0.1.0"
+            // Was hardcoded separately from the `version` above and had drifted to
+            // 0.1.0 while that one moved to 0.1.1 — JitPack builds its coordinate from
+            // the git tag regardless, but a mismatch here is exactly what let the two
+            // fall out of sync unnoticed. Single source of truth now.
+            version = project.version.toString()
             afterEvaluate {
                 from(components["release"])
             }
