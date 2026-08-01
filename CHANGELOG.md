@@ -12,6 +12,18 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Added
+
+- **Comments can carry image attachments**, closing the gap against the iOS SDK. The
+  comment composer gets a photo picker, a strip of staged attachments with per-item
+  upload progress and a remove button, and a five-attachment cap — matching the
+  submit-feedback form. Images are compressed before upload (1600px long edge, JPEG
+  q80) like everywhere else, and sending is blocked while an upload is still in flight,
+  since an attachment only has a `storageKey` to send once it has finished uploading.
+
+  The composer had an `onAttach` hook and `submitComment` already took an `attachments`
+  argument, but nothing ever populated either.
+
 ## [0.3.0] - 2026-08-01
 
 ### Added
@@ -54,9 +66,3 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
   room on the server. EXIF orientation is baked into the pixels so portrait photos are not
   uploaded sideways, decoding happens off the main thread, and GIFs (which would lose their
   animation) plus anything that would grow when re-encoded are uploaded untouched.
-
-### Known gaps
-
-- Comments cannot carry attachments on Android yet. `FeedbackDetailViewModel.submitComment`
-  accepts an `attachments` argument, but the comment composer never populates it — the iOS
-  SDK does support this.
