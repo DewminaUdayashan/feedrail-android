@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-08-01
+
 ### Fixed
 
 - **Submitting feedback with an image attachment no longer fails.** The SDK sent the
