@@ -253,6 +253,10 @@ data class FeedRailAuthResponse(
 
 @JsonClass(generateAdapter = true)
 data class FeedRailUploadResponse(
+    /** Opaque storage path (e.g. `attachments/<uuid>.jpg`). This — not [url] — is
+     *  what the API expects back on the attachments[] of a submit/comment call. */
+    val storageKey: String,
+    /** Ready-to-render path for the uploaded file; display only. */
     val url: String,
     val fileName: String,
     val mimeType: String,

@@ -15,11 +15,14 @@ import com.feedrail.sdk.models.FeedRailBoard
 import com.feedrail.sdk.models.StagedAttachment
 import com.feedrail.sdk.models.SubmitFeedbackBody
 import com.feedrail.sdk.`public`.FeedRailSDK
+import com.feedrail.sdk.util.ImageCompressor
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -92,10 +95,15 @@ class SubmitFeedbackViewModel(
         viewModelScope.launch {
             updateStagedState(staged.localUri) { it.copy(isUploading = true) }
             try {
-                val bytes = context.contentResolver.openInputStream(staged.localUri)?.readBytes()
-                    ?: return@launch
-                val body = bytes.toRequestBody(staged.mimeType.toMediaType())
-                val part = MultipartBody.Part.createFormData("file", staged.fileName, body)
+                // Downscale/re-encode on a worker thread — decoding a 12MP photo on
+                // the main thread would jank the picker dismissal animation.
+                val compressed = withContext(Dispatchers.IO) {
+                    ImageCompressor.compress(
+                        context, staged.localUri, staged.mimeType, staged.fileName,
+                    )
+                } ?: return@launch
+                val body = compressed.bytes.toRequestBody(compressed.mimeType.toMediaType())
+                val part = MultipartBody.Part.createFormData("file", compressed.fileName, body)
                 val response = apiClient.call { uploadAttachment(part) }
                 updateStagedState(staged.localUri) { it.copy(isUploading = false, uploadResponse = response) }
             } catch (e: Exception) {
@@ -124,7 +132,7 @@ class SubmitFeedbackViewModel(
             try {
                 val attachments = s.stagedAttachments.mapNotNull { a ->
                     a.uploadResponse?.let { r ->
-                        AttachmentInput(r.url, r.fileName, r.mimeType, r.fileSize)
+                        AttachmentInput(r.storageKey, r.fileName, r.mimeType, r.fileSize)
                     }
                 }
                 apiClient.call {

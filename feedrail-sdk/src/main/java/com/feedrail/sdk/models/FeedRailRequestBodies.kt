@@ -12,7 +12,7 @@ data class SubmitFeedbackBody(
 
 @JsonClass(generateAdapter = true)
 data class AttachmentInput(
-    val url: String,
+    val storageKey: String,
     val fileName: String,
     val mimeType: String,
     val fileSize: Int,
