@@ -12,6 +12,19 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-01
+
+### Added
+
+- **Authors can now see the review state of their own posts.** A post awaiting approval
+  is marked "Pending review", and a rejected one is marked "Rejected" and shows the
+  team's reason on the detail screen. The API has always returned `moderationStatus` and
+  `rejectionReason` — and only ever returns a non-approved post to its own author — but
+  the SDK's model didn't declare the fields, so they were parsed away and the author saw
+  their post sitting in the list looking published with no hint that nobody else could
+  see it. The raw value is kept as a `String` and mapped leniently, so a status added by
+  a future API can't fail the whole response.
+
 ## [0.2.0] - 2026-08-01
 
 ### Added

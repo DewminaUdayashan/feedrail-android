@@ -196,6 +196,17 @@ fun FeedbackDetailScreen(
                         Spacer(modifier = Modifier.height(24.dp))
                     }
 
+                    // Review state — only ever present on the reader's own post, and
+                    // carries the team's rejection reason when there is one.
+                    val moderation = feedback.moderationState
+                    if (moderation != null && moderation.needsAuthorAttention) {
+                        ModerationNotice(
+                            status = moderation,
+                            rejectionReason = feedback.rejectionReason,
+                        )
+                        Spacer(modifier = Modifier.height(20.dp))
+                    }
+
                     // Body content
                     val content = feedback.content
                     if (!content.isNullOrBlank()) {

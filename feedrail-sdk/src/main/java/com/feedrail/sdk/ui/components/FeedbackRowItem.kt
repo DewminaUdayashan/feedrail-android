@@ -72,8 +72,14 @@ fun FeedbackRowItem(
                             }
                         }
 
+                        // A post awaiting review or rejected is only ever visible to
+                        // its own author, so the review state replaces the workflow
+                        // status — it's what actually matters to them.
+                        val moderation = item.moderationState
                         val status = item.status
-                        if (status != null) {
+                        if (moderation != null && moderation.needsAuthorAttention) {
+                            ModerationBadge(status = moderation)
+                        } else if (status != null) {
                             StatusBadge(name = status.name, color = status.color)
                         }
                     }

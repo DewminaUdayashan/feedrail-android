@@ -119,4 +119,9 @@
     <!-- Settings / Language -->
     <string name="feedrail_settings_language">Language</string>
     <string name="feedrail_settings_language_title">Select Language</string>
+    <!-- Moderation - shown only to the author of a post that is not yet approved -->
+    <string name="feedrail_moderation_pending">Pending review</string>
+    <string name="feedrail_moderation_pending_explanation">Only you can see this until the team approves it.</string>
+    <string name="feedrail_moderation_rejected">Rejected</string>
+    <string name="feedrail_moderation_rejected_explanation">This post was not approved and is only visible to you.</string>
 </resources>

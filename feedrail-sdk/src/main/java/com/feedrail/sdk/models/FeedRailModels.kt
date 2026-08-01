@@ -147,6 +147,15 @@ data class FeedRailFeedbackItem(
     val attachments: List<FeedRailAttachment>? = null,
     val comments: List<FeedRailComment>? = null,
     val hasVoted: Boolean? = null,
+    /**
+     * Review state of the post. The API only ever returns a non-approved post to its
+     * own author, so a PENDING/REJECTED value here always concerns the current user's
+     * own submission. Kept as a raw String rather than an enum so an unrecognised
+     * value from a newer API can't fail the whole response — see [moderationState].
+     */
+    val moderationStatus: String? = null,
+    /** Why the post was rejected, when the team supplied a reason. */
+    val rejectionReason: String? = null,
     @Json(name = "_count") val count: FeedRailFeedbackCount? = null,
     val createdAt: String,
     val updatedAt: String,
@@ -154,6 +163,33 @@ data class FeedRailFeedbackItem(
     val voteCount: Int get() = count?.votes ?: 0
     val commentCount: Int get() = count?.comments ?: 0
     val author: FeedRailUser? get() = if (isTeamPost) orgUser else user
+
+    /** [moderationStatus] mapped to a known case, or null if absent/unrecognised. */
+    val moderationState: FeedRailModerationStatus?
+        get() = FeedRailModerationStatus.from(moderationStatus)
+}
+
+/** Review state of a post, as surfaced to its own author. */
+enum class FeedRailModerationStatus {
+    PENDING,
+    APPROVED,
+    REJECTED,
+    ;
+
+    /**
+     * Whether this state is worth surfacing. An approved post looks like everyone
+     * else's and needs no extra chrome.
+     */
+    val needsAuthorAttention: Boolean get() = this == PENDING || this == REJECTED
+
+    companion object {
+        /**
+         * Lenient lookup: an unknown value (e.g. a case added by a newer API) maps to
+         * null and simply renders no badge, rather than throwing.
+         */
+        fun from(raw: String?): FeedRailModerationStatus? =
+            entries.firstOrNull { it.name == raw }
+    }
 }
 
 @JsonClass(generateAdapter = true)
