@@ -12,6 +12,17 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-08-01
+
+### Added
+
+- **Images open in a full-screen viewer inside the SDK** instead of launching a browser
+  via `ACTION_VIEW`. Pinch to zoom, pan while zoomed, and swipe between all images
+  attached to the same post. Being kicked out to a browser to look at a screenshot on
+  your own feedback is jarring, and it also handed a short-lived signed attachment URL to
+  the browser, where it lingers in history after it stops working. Non-image attachments
+  (PDF, CSV, …) still open externally, which is the right place for them.
+
 ## [0.1.2] - 2026-08-01
 
 ### Fixed
