@@ -19,6 +19,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -37,6 +41,17 @@ fun AttachmentDisplayRow(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
+    val images = attachments.filter { it.isImage }
+    var viewingImageIndex by remember { mutableStateOf<Int?>(null) }
+
+    viewingImageIndex?.let { index ->
+        AttachmentImageViewer(
+            images = images,
+            baseUrl = baseUrl,
+            initialIndex = index,
+            onDismiss = { viewingImageIndex = null },
+        )
+    }
 
     Row(
         modifier = modifier
@@ -44,11 +59,7 @@ fun AttachmentDisplayRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         attachments.forEach { attachment ->
-            val resolvedUrl = if (attachment.url.startsWith("http")) {
-                attachment.url
-            } else {
-                "$baseUrl${attachment.url}"
-            }
+            val resolvedUrl = resolveAttachmentUrl(attachment, baseUrl)
 
             if (attachment.isImage) {
                 Surface(
@@ -56,8 +67,10 @@ fun AttachmentDisplayRow(
                     modifier = Modifier
                         .size(72.dp)
                         .clickable {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(resolvedUrl))
-                            context.startActivity(intent)
+                            // Index within `images`, not `attachments` — the viewer
+                            // only pages through images, so a mixed list would
+                            // otherwise open the wrong one.
+                            viewingImageIndex = images.indexOf(attachment)
                         },
                     tonalElevation = 1.dp,
                 ) {
