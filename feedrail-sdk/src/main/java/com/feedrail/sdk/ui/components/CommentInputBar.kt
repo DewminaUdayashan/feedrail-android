@@ -1,16 +1,22 @@
 package com.feedrail.sdk.ui.components
 
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.InsertDriveFile
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.feedrail.sdk.R
+import com.feedrail.sdk.models.StagedAttachment
 
 @Composable
 fun CommentInputBar(
@@ -21,6 +27,10 @@ fun CommentInputBar(
     isSubmitting: Boolean,
     enabled: Boolean,
     modifier: Modifier = Modifier,
+    stagedAttachments: List<StagedAttachment> = emptyList(),
+    onRemoveAttachment: (Uri) -> Unit = {},
+    canSend: Boolean = text.isNotBlank(),
+    canAttach: Boolean = true,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -43,16 +53,82 @@ fun CommentInputBar(
             return@Surface
         }
 
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding(),
+        ) {
+        // Staged attachments sit above the input row, so a long filename can wrap
+        // instead of squeezing the text field.
+        if (stagedAttachments.isNotEmpty()) {
+            FlowRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 12.dp, end = 12.dp, top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+            ) {
+                stagedAttachments.forEach { attachment ->
+                    InputChip(
+                        selected = false,
+                        onClick = {},
+                        shape = MaterialTheme.shapes.medium,
+                        label = {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.padding(vertical = 4.dp),
+                            ) {
+                                Icon(
+                                    imageVector = if (attachment.isImage) {
+                                        Icons.Default.Image
+                                    } else {
+                                        Icons.AutoMirrored.Filled.InsertDriveFile
+                                    },
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Text(
+                                    text = attachment.fileName,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.widthIn(max = 140.dp),
+                                )
+                                if (attachment.isUploading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(14.dp),
+                                        strokeWidth = 1.5.dp,
+                                    )
+                                }
+                            }
+                        },
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { onRemoveAttachment(attachment.localUri) },
+                                modifier = Modifier.size(24.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.feedrail_general_remove),
+                                    modifier = Modifier.size(14.dp),
+                                )
+                            }
+                        },
+                    )
+                }
+            }
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .navigationBarsPadding()
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.Bottom,
         ) {
             IconButton(
                 onClick = onAttach,
-                enabled = !isSubmitting,
+                enabled = !isSubmitting && canAttach,
             ) {
                 Icon(
                     imageVector = Icons.Default.AttachFile,
@@ -93,7 +169,10 @@ fun CommentInputBar(
             } else {
                 IconButton(
                     onClick = onSend,
-                    enabled = text.isNotBlank(),
+                    // Disabled while an attachment is still uploading — sending then
+                    // would post the comment without it, since only uploaded items
+                    // have a storageKey.
+                    enabled = canSend,
                     modifier = Modifier.size(48.dp),
                     colors = IconButtonDefaults.iconButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary,
@@ -106,6 +185,7 @@ fun CommentInputBar(
                     )
                 }
             }
+        }
         }
     }
 }

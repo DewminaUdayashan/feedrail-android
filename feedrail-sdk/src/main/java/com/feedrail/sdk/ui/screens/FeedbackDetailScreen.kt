@@ -3,6 +3,9 @@ package com.feedrail.sdk.ui.screens
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +17,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,9 +36,16 @@ fun FeedbackDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(feedbackId) {
         viewModel.load(feedbackId)
+    }
+
+    val commentAttachmentPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetMultipleContents(),
+    ) { uris: List<Uri> ->
+        uris.forEach { uri -> viewModel.addAttachment(uri, context) }
     }
 
     Scaffold(
@@ -87,9 +98,13 @@ fun FeedbackDetailScreen(
                         text = uiState.commentText,
                         onTextChange = viewModel::updateCommentText,
                         onSend = { viewModel.submitComment() },
-                        onAttach = { /* TODO: attachment picker */ },
+                        onAttach = { commentAttachmentPicker.launch("*/*") },
                         isSubmitting = uiState.isSubmittingComment,
                         enabled = uiState.isAuthenticated,
+                        stagedAttachments = uiState.stagedAttachments,
+                        onRemoveAttachment = viewModel::removeAttachment,
+                        canSend = uiState.canSendComment,
+                        canAttach = uiState.stagedAttachments.size < 5,
                     )
                 }
             }
