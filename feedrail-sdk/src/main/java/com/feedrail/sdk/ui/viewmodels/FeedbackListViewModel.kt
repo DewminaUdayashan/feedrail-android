@@ -31,7 +31,7 @@ data class FeedbackListUiState(
     val currentPage: Int = 1,
     val totalPages: Int = 1,
     val selectedBoardSlug: String? = null,
-    val sortOption: String = "newest",
+    val sortOption: String = "upvotes",
     val isAuthenticated: Boolean = false,
     val isAuthenticating: Boolean = false,
     val isGuest: Boolean = true,

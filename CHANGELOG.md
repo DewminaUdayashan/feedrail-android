@@ -12,6 +12,19 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Fixed
+
+- **"Top Voted" now actually sorts by votes.** The option sent `sort=top`, which the API
+  does not recognise — it accepts `upvotes`, and falls back to newest-first for anything
+  else. Picking "Top Voted" changed the pill label and left the list in its original
+  order. It now sends `upvotes`, matching the iOS SDK and the web portal.
+
+### Changed
+
+- **The feedback list opens on "Top Voted" instead of "Newest".** The most-wanted posts
+  are what a feedback board is for, and the web portal has always defaulted this way —
+  the SDK was the odd one out. Newest is still one tap away in the sort menu.
+
 ## [0.5.0] - 2026-08-02
 
 ### Added

@@ -28,7 +28,7 @@ private data class SortOption(val key: String, val labelResId: Int)
 private val sortOptions = listOf(
     SortOption("newest", R.string.feedrail_feedback_list_sort_newest),
     SortOption("oldest", R.string.feedrail_feedback_list_sort_oldest),
-    SortOption("top", R.string.feedrail_feedback_list_sort_top),
+    SortOption("upvotes", R.string.feedrail_feedback_list_sort_top),
     SortOption("comments", R.string.feedrail_feedback_list_sort_comments),
 )
 
@@ -59,7 +59,7 @@ fun FeedbackListScreen(
 
     val currentSortLabel = sortOptions.firstOrNull { it.key == uiState.sortOption }
         ?.let { stringResource(it.labelResId) }
-        ?: stringResource(R.string.feedrail_feedback_list_sort_newest)
+        ?: stringResource(R.string.feedrail_feedback_list_sort_top)
 
     Column(modifier = modifier.fillMaxSize()) {
         // Board filter chips and Sort row (only if NOT in a global error state)
