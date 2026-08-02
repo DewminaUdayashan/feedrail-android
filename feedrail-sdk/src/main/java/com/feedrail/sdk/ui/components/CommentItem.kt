@@ -81,6 +81,18 @@ fun CommentItem(
                     )
                 }
 
+                // Only ever present on the reader's own comment — without it a
+                // pending comment looks published and the author has no idea nobody
+                // else can see it yet.
+                val moderation = comment.moderationState
+                if (moderation != null && moderation.needsAuthorAttention) {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    ModerationNotice(
+                        status = moderation,
+                        rejectionReason = comment.rejectionReason,
+                    )
+                }
+
                 val attachments = comment.attachments
                 if (!attachments.isNullOrEmpty()) {
                     Spacer(modifier = Modifier.height(6.dp))
