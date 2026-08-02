@@ -118,10 +118,22 @@ data class FeedRailComment(
     val attachments: List<FeedRailAttachment>? = null,
     val replies: List<FeedRailComment>? = null,
     val feedbackItem: FeedRailReleaseNoteFeedbackItem? = null,
+    /**
+     * Review state of the comment. The API only returns a non-approved comment to its
+     * own author, so PENDING/REJECTED here always concerns the reader's own comment.
+     * Kept as a raw String and mapped leniently — see [moderationState].
+     */
+    val moderationStatus: String? = null,
+    /** Why the comment was rejected, when the team supplied a reason. */
+    val rejectionReason: String? = null,
     val createdAt: String,
 ) {
     val author: FeedRailUser? get() = orgUser ?: user
     val isVerified: Boolean get() = orgUser != null
+
+    /** [moderationStatus] mapped to a known case, or null if absent/unrecognised. */
+    val moderationState: FeedRailModerationStatus?
+        get() = FeedRailModerationStatus.from(moderationStatus)
 }
 
 // ── Feedback ──────────────────────────────────────────────────────────────────

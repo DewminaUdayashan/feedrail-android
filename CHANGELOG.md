@@ -12,6 +12,17 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-02
+
+### Added
+
+- **Comments now show their review state to their author.** A comment awaiting approval
+  is marked "Pending review", and a rejected one shows the team's reason — matching what
+  posts already did. The API has always returned `moderationStatus` and `rejectionReason`
+  on comments, and only ever returns a non-approved comment to its own author, but the
+  comment model didn't declare the fields so they were parsed away.
+
+
 ## [0.4.0] - 2026-08-02
 
 ### Added
