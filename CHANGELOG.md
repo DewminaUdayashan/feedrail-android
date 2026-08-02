@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-02
+
 ### Fixed
 
 - **"Top Voted" now actually sorts by votes.** The option sent `sort=top`, which the API
