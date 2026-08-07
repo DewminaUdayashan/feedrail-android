@@ -125,7 +125,14 @@ fun FeedRailNavGraph(
     ) {
         val isArchived = feedbackListState.isProjectArchived == true
         val native = sdk.config.themeColor
-        if (!isArchived && native != null && feedbackListState.branding?.allowsNativeTheme == true) {
+        // `?: true` is the important part: until branding arrives we cannot know
+        // whether the plan permits the host's colour, and FeedRail green is the
+        // worse guess of the two. Rendering our brand colour inside someone else's
+        // app reads as broken; rendering theirs reads as correct even if the
+        // server later overrides it. The host handed us this colour synchronously
+        // at configure time, so it costs nothing to trust it.
+        val allowsNative = feedbackListState.branding?.allowsNativeTheme ?: true
+        if (!isArchived && native != null && allowsNative) {
             native
         } else {
             val hex = if (isArchived || feedbackListState.branding == null) {

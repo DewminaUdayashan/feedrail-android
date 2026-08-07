@@ -6,9 +6,16 @@ import androidx.compose.runtime.Composable
 import com.feedrail.sdk.api.AuthInterceptor
 import com.feedrail.sdk.api.FeedRailApiClient
 import com.feedrail.sdk.auth.AuthManager
+import com.feedrail.sdk.data.BrandingStore
 import com.feedrail.sdk.data.TokenStorage
 import com.feedrail.sdk.localization.LanguageManager
+import com.feedrail.sdk.models.FeedRailBoardsResponse
 import com.feedrail.sdk.ui.FeedRailBottomSheet
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 
 /**
  * Main entry point for the FeedRail SDK.
@@ -36,6 +43,21 @@ object FeedRailSDK {
     private var _authManager: AuthManager? = null
     private var _languageManager: LanguageManager? = null
     private var _authInterceptor: AuthInterceptor? = null
+    private var _brandingStore: BrandingStore? = null
+
+    /** Scope for launch-time warm-up work. Survives Activity/ViewModel lifecycles. */
+    private val prefetchScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    /**
+     * The in-flight `/portal/boards` fetch started by [configure].
+     *
+     * Held so the first screen to need branding can await *this* rather than
+     * issuing a second identical request. Cleared once consumed.
+     */
+    private var brandingPrefetch: Deferred<FeedRailBoardsResponse>? = null
+
+    internal val brandingStore: BrandingStore?
+        get() = _brandingStore
 
     val config: FeedRailConfig
         get() = _config ?: error("FeedRailSDK.configure() must be called first.")
@@ -84,7 +106,57 @@ object FeedRailSDK {
         val authManager = AuthManager(config, tokenStorage, appContext)
         authManager.apiClient = apiClient
         _authManager = authManager
+
+        _brandingStore = BrandingStore(
+            context = appContext,
+            organizationSlug = config.organizationSlug,
+            projectSlug = config.projectSlug,
+        )
+        startBrandingPrefetch()
     }
+
+    /**
+     * Warms branding and the board list at launch, so presenting the feedback UI
+     * does not begin with a round-trip the user watches.
+     *
+     * `/portal/boards` is unauthenticated and identity-independent, which is why
+     * this is safe to do at launch: it deliberately does *not* authenticate.
+     * Creating the anonymous session here instead would register an end user for
+     * every app launch, including the many that never open feedback — inflating
+     * the audience list with people who never used the feature.
+     *
+     * Failure-tolerant: a launch must never be slowed or broken by this. If it
+     * fails, the view model falls back to fetching normally.
+     */
+    private fun startBrandingPrefetch() {
+        val client = _apiClient ?: return
+        brandingPrefetch?.cancel()
+        brandingPrefetch = prefetchScope.async {
+            client.call { getBoards() }
+        }
+    }
+
+    /**
+     * Hands over the prefetched payload, waiting on it if it is still in flight.
+     *
+     * Returns `null` when there was no prefetch, or it failed or was cancelled —
+     * all of which mean "fetch it yourself". Single-use: the handle is cleared so
+     * a later refresh goes to the network rather than replaying a stale result.
+     */
+    internal suspend fun consumeBrandingPrefetch(): FeedRailBoardsResponse? {
+        val task = brandingPrefetch ?: return null
+        brandingPrefetch = null
+        return try {
+            task.await()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    // Deliberately no re-warm on app resume. Presenting the feedback UI always
+    // hits the network (the prefetch is single-use), so staleness is already
+    // corrected on every open; re-warming per resume would add a request each
+    // time the user switches apps, for a saving only the second open would see.
 
     /**
      * Identify (log in) the current user at runtime. Use when the user signs in
