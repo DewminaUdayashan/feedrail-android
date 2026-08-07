@@ -12,6 +12,28 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Changed
+
+- **The feedback UI no longer opens in FeedRail's brand colour before switching to
+  yours.** Branding was fetched only after the auth handshake finished, so the sheet spent
+  the whole of it painted in the fallback green and then snapped to the project's real
+  colour. Four things now prevent that:
+
+  - **Branding no longer waits for authentication.** `/portal/boards` needs no token, but
+    the load was held behind the auth state, so the UI could not even ask what colour it
+    should be until sign-in completed. The feedback *list* still waits, because it carries
+    per-user state such as `hasVoted`.
+  - `configure()` warms `/portal/boards` at launch, so presenting the sheet usually has
+    branding already in hand instead of starting a round-trip the user watches. It cannot
+    slow or break startup, and it deliberately does **not** authenticate, so no anonymous
+    end user is registered for launches that never open feedback.
+  - The last-known branding is cached on device and applied before the first frame, so
+    every launch after the first is correct immediately. A refresh always follows.
+  - If you pass `themeColor`, it is now used *while* branding is still loading rather than
+    only after the server confirms your plan allows it. Showing FeedRail green inside your
+    app looked broken; showing your own colour looks right even if the server later
+    overrides it.
+
 ## [0.6.0] - 2026-08-02
 
 ### Fixed

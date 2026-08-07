@@ -56,6 +56,12 @@ class FeedbackListViewModel(
     val uiState: StateFlow<FeedbackListUiState> = _uiState.asStateFlow()
 
     init {
+        // Branding is deliberately NOT waited on auth. `/portal/boards` needs no
+        // token — the old code held it behind the auth state, so the UI painted in
+        // the fallback brand colour for the whole handshake before it could even
+        // ask what colour it should be.
+        loadBoards()
+
         viewModelScope.launch {
             authManager.authState.collectLatest { state ->
                 _uiState.value = _uiState.value.copy(
@@ -64,10 +70,8 @@ class FeedbackListViewModel(
                     isGuest = (state as? AuthState.Authenticated)?.user?.isGuestUser ?: true,
                 )
                 if (state is AuthState.Authenticated || state is AuthState.Guest) {
-                    // Load boards (branding + board list) once auth resolves so we have a token
-                    if (_uiState.value.boards.isEmpty()) {
-                        loadBoards()
-                    }
+                    // The feedback list *does* need identity — it carries per-user
+                    // state such as hasVoted — so it still waits.
                     if (_uiState.value.items.isEmpty() && !_uiState.value.isLoading) {
                         loadInitial()
                     }
@@ -76,19 +80,52 @@ class FeedbackListViewModel(
         }
     }
 
+    /**
+     * Resolves branding in three escalating steps, so the UI paints in the
+     * customer's colours as early as it can:
+     *
+     * 1. the on-device cache, applied immediately — correct colours on the first
+     *    frame for every launch after the first;
+     * 2. the prefetch started by `FeedRailSDK.configure()`, awaited rather than
+     *    duplicated — usually already finished by the time the sheet opens;
+     * 3. a fresh request, if there was no prefetch or it failed.
+     *
+     * Branding stays non-critical throughout: every step may fail quietly and the
+     * UI falls back to defaults, as it did before any of this existed.
+     */
     private fun loadBoards() {
+        val store = FeedRailSDK.brandingStore
+
+        // 1. Paint from cache first, so no frame renders in the wrong colour.
+        if (_uiState.value.branding == null) {
+            store?.load()?.let(::applyBoards)
+        }
+
         viewModelScope.launch {
+            // 2. Prefer the launch-time prefetch over a duplicate request.
+            FeedRailSDK.consumeBrandingPrefetch()?.let { prefetched ->
+                applyBoards(prefetched)
+                store?.save(prefetched)
+                return@launch
+            }
+
+            // 3. No usable prefetch — fetch it now.
             try {
                 val response = apiClient.call { getBoards() }
-                _uiState.value = _uiState.value.copy(
-                    boards = response.boards,
-                    branding = response.branding,
-                    isProjectArchived = response.isProjectArchived ?: false,
-                )
+                applyBoards(response)
+                store?.save(response)
             } catch (e: Exception) {
                 Log.e("FeedRail", "loadBoards failed: ${e.message}", e)
             }
         }
+    }
+
+    private fun applyBoards(response: com.feedrail.sdk.models.FeedRailBoardsResponse) {
+        _uiState.value = _uiState.value.copy(
+            boards = response.boards,
+            branding = response.branding,
+            isProjectArchived = response.isProjectArchived ?: false,
+        )
     }
 
     private fun loadInitial() {
