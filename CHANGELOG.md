@@ -12,6 +12,26 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Fixed
+
+- **A project's logo never appeared in the feedback header — and took the project name
+  down with it.** The API returns `logoUrl` as a path relative to the API host
+  (`/api/v1/uploads/logos/…`), which the image loader was handed unchanged and could not
+  fetch. Worse, the presence of a `logoUrl` alone committed the header to the image, so
+  the failure left the header empty rather than falling back to the project name — there
+  was no route back to the text once the image branch was taken. The path is now resolved
+  against the configured base URL, and any logo that still fails to load (404, offline)
+  falls back to the name. Projects with no logo were unaffected.
+
+### Changed
+
+- **Board filter chips show their board's colour**, as a dot before the label — the cue
+  iOS has always had, and the one thing tying a chip to the coloured board label on the
+  cards below it.
+- **The sort control is an icon alone.** The order it is currently set to is named, and
+  checked, in the sheet it opens, and carried for screen readers by its content
+  description.
+
 ## [0.7.0] - 2026-08-08
 
 ### Changed
