@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-08-08
+
 ### Fixed
 
 - **A project's logo never appeared in the feedback header — and took the project name
