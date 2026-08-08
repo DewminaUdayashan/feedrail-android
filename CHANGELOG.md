@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-08
+
 ### Changed
 
 - **The feedback UI is a full screen instead of a bottom sheet.** The whole experience —
