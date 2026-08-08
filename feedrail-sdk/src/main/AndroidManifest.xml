@@ -6,7 +6,8 @@
             android:name=".ui.FeedRailActivity"
             android:exported="false"
             android:configChanges="orientation|screenSize|keyboardHidden|screenLayout|uiMode"
-            android:theme="@style/Theme.FeedRail.Transparent"
+            android:enableOnBackInvokedCallback="true"
+            android:theme="@style/Theme.FeedRail"
             android:windowSoftInputMode="adjustResize" />
     </application>
 

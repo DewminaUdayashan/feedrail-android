@@ -118,7 +118,7 @@ fun DemoScreen() {
     }
 
     if (showFeedback) {
-        FeedRailSDK.FeedbackSheet(
+        FeedRailSDK.FeedbackScreen(
             onDismiss = { showFeedback = false },
             onFeedbackSubmitted = {
                 submittedCount++

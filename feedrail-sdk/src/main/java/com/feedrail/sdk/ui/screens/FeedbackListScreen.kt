@@ -1,11 +1,11 @@
 package com.feedrail.sdk.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.*
@@ -42,7 +42,7 @@ fun FeedbackListScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    var showSortMenu by remember { mutableStateOf(false) }
+    var showSortSheet by remember { mutableStateOf(false) }
 
     // Trigger load more when near the end
     val shouldLoadMore by remember {
@@ -67,75 +67,13 @@ fun FeedbackListScreen(
         val isInitialLoading = (uiState.isLoading || !uiState.hasLoadedOnce) && uiState.items.isEmpty()
         
         if (!isErrorState && !isInitialLoading && (uiState.items.isNotEmpty() || uiState.boards.size > 1)) {
-            // Board filter chips (only if more than 1 board)
-            if (uiState.boards.size > 1) {
-                BoardFilterChips(
-                    boards = uiState.boards,
-                    selectedSlug = uiState.selectedBoardSlug,
-                    onSelect = viewModel::selectBoard,
-                )
-            }
-
-            // Sort row
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Spacer(modifier = Modifier.weight(1f))
-                // Sort pill
-                Box {
-                    Surface(
-                        onClick = { showSortMenu = true },
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                        shape = MaterialTheme.shapes.medium
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.Sort,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.size(18.dp),
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = currentSortLabel,
-                                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = showSortMenu,
-                        onDismissRequest = { showSortMenu = false },
-                        containerColor = MaterialTheme.colorScheme.surface,
-                    ) {
-                        sortOptions.forEach { option ->
-                            val isSelected = uiState.sortOption == option.key
-                            DropdownMenuItem(
-                                text = { 
-                                    Text(
-                                        stringResource(option.labelResId),
-                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-                                    ) 
-                                },
-                                onClick = {
-                                    viewModel.selectSort(option.key)
-                                    showSortMenu = false
-                                },
-                                trailingIcon = if (isSelected) {
-                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                } else null
-                            )
-                        }
-                    }
-                }
-            }
+            FeedbackFilterBar(
+                boards = uiState.boards,
+                selectedSlug = uiState.selectedBoardSlug,
+                onSelectBoard = viewModel::selectBoard,
+                sortLabel = currentSortLabel,
+                onSortClick = { showSortSheet = true },
+            )
         }
 
         // Archived project warning
@@ -231,11 +169,9 @@ fun FeedbackListScreen(
                                 }
                             }
 
-                            if (uiState.branding?.shouldShowPoweredBy == true) {
-                                item {
-                                    PoweredByBadge()
-                                }
-                            }
+                            // No "Powered by" item here: the navigation host already
+                            // pins one above the toolbar, so the list was showing it
+                            // twice whenever the feed was scrolled to the end.
                         }
                     }
                 }
@@ -251,6 +187,75 @@ fun FeedbackListScreen(
                 ) {
                     CircularProgressIndicator()
                 }
+            }
+        }
+    }
+
+    if (showSortSheet) {
+        SortOptionsSheet(
+            selectedKey = uiState.sortOption,
+            onSelect = { key ->
+                viewModel.selectSort(key)
+                showSortSheet = false
+            },
+            onDismiss = { showSortSheet = false },
+        )
+    }
+}
+
+/**
+ * The sort picker.
+ *
+ * A dropdown menu anchored to a pill is a desktop idiom that lands wherever there is
+ * room; a bottom sheet is what Android users expect for "pick one of these", and it is
+ * the kind of short, single-purpose choice a sheet is actually right for.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SortOptionsSheet(
+    selectedKey: String?,
+    onSelect: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(bottom = 8.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.feedrail_feedback_list_sort_label),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                modifier = Modifier.padding(start = 24.dp, end = 24.dp, bottom = 8.dp),
+            )
+
+            sortOptions.forEach { option ->
+                val isSelected = selectedKey == option.key
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(option.labelResId),
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                            ),
+                        )
+                    },
+                    trailingContent = if (isSelected) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    } else null,
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    modifier = Modifier.clickable { onSelect(option.key) },
+                )
             }
         }
     }

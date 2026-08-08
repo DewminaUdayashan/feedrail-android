@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Transparent theme so the host screen shows through behind the
-         feedback bottom sheet and its scrim. -->
-    <style name="Theme.FeedRail.Transparent" parent="@android:style/Theme.Translucent.NoTitleBar">
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
+    <!-- Opaque, edge-to-edge theme for the feedback experience. The system bars are
+         transparent because FeedRailActivity draws behind them and the Compose tree
+         applies the insets itself. DayNight keeps the pre-Compose window background in
+         step with the device theme, so there is no light flash on a dark device. -->
+    <style name="Theme.FeedRail" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="android:windowBackground">?android:attr/colorBackground</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>

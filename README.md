@@ -62,14 +62,14 @@ var showFeedback by remember { mutableStateOf(false) }
 Button(onClick = { showFeedback = true }) { Text("Give Feedback") }
 
 if (showFeedback) {
-    FeedRailSDK.FeedbackSheet(onDismiss = { showFeedback = false })
+    FeedRailSDK.FeedbackScreen(onDismiss = { showFeedback = false })
 }
 ```
 
 **From a plain-View / non-Compose host:**
 
 ```kotlin
-FeedRailSDK.present(context = this)   // pass an Activity so the sheet appears over it
+FeedRailSDK.present(context = this)   // pass an Activity so it appears over it
 ```
 
 ---
