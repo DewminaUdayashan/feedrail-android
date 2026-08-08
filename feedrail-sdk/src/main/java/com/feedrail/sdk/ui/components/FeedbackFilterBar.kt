@@ -1,14 +1,17 @@
 package com.feedrail.sdk.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
@@ -21,6 +24,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.feedrail.sdk.R
 import com.feedrail.sdk.models.FeedRailBoard
+import com.feedrail.sdk.ui.theme.Color as FeedRailColor
 
 /**
  * Board filters and the sort control on a single row.
@@ -59,6 +63,7 @@ fun FeedbackFilterBar(
                 item {
                     BoardChip(
                         label = stringResource(R.string.feedrail_feedback_list_filter_all),
+                        color = null,
                         selected = selectedSlug == null,
                         onClick = { onSelectBoard(null) },
                     )
@@ -66,6 +71,7 @@ fun FeedbackFilterBar(
                 items(items = boards, key = { it.slug }) { board ->
                     BoardChip(
                         label = board.name,
+                        color = board.color,
                         selected = selectedSlug == board.slug,
                         onClick = { onSelectBoard(board.slug) },
                     )
@@ -75,8 +81,8 @@ fun FeedbackFilterBar(
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        SortChip(
-            label = sortLabel,
+        SortButton(
+            currentSortLabel = sortLabel,
             onClick = onSortClick,
             modifier = Modifier.padding(start = 8.dp, end = 16.dp),
         )
@@ -86,6 +92,7 @@ fun FeedbackFilterBar(
 @Composable
 private fun BoardChip(
     label: String,
+    color: String?,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
@@ -100,32 +107,50 @@ private fun BoardChip(
                 ),
             )
         },
+        // The board's own colour, as a dot — the same cue iOS has always shown, and the
+        // one thing tying a chip to the coloured board label on the cards below it.
+        leadingIcon = color?.let { hex ->
+            val dotColor = runCatching { FeedRailColor(hex) }.getOrNull()
+            if (dotColor == null) {
+                null
+            } else {
+                {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(dotColor),
+                    )
+                }
+            }
+        },
     )
 }
 
+/**
+ * Sort, as an icon alone.
+ *
+ * The current order is not spelled out here — it is named, and checked, in the sheet this
+ * opens, and carried for screen readers by the content description.
+ */
 @Composable
-private fun SortChip(
-    label: String,
+private fun SortButton(
+    currentSortLabel: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AssistChip(
+    FilledTonalIconButton(
         onClick = onClick,
-        modifier = modifier,
-        label = {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
-            )
-        },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Sort,
-                contentDescription = stringResource(R.string.feedrail_feedback_list_sort_label),
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
-            )
-        },
-    )
+        modifier = modifier.size(40.dp),
+    ) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.Sort,
+            contentDescription = stringResource(
+                R.string.feedrail_feedback_list_sort_label,
+            ) + ": " + currentSortLabel,
+            modifier = Modifier.size(20.dp),
+        )
+    }
 }
 
 /**

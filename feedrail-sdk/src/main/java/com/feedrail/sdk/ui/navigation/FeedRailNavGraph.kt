@@ -221,6 +221,7 @@ fun FeedRailNavGraph(
                                         title = stringResource(R.string.feedrail_general_feedback),
                                         alignment = Alignment.CenterStart,
                                         contentPadding = PaddingValues(0.dp),
+                                        baseUrl = sdk.config.environment.resolvedBaseUrl,
                                     )
                                 },
                                 // The close button is the whole point: as a bottom sheet
