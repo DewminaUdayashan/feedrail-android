@@ -10,7 +10,8 @@ import com.feedrail.sdk.data.BrandingStore
 import com.feedrail.sdk.data.TokenStorage
 import com.feedrail.sdk.localization.LanguageManager
 import com.feedrail.sdk.models.FeedRailBoardsResponse
-import com.feedrail.sdk.ui.FeedRailBottomSheet
+import com.feedrail.sdk.ui.FeedRailFeedbackContent
+import com.feedrail.sdk.ui.FeedRailFeedbackDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -189,21 +190,29 @@ object FeedRailSDK {
     }
 
     /**
-     * Returns the feedback bottom sheet composable.
+     * Presents the feedback experience full-screen over the current screen.
      *
      * Present this inside a conditional block driven by your own state:
      * ```kotlin
      * if (showFeedback) {
-     *     FeedRailSDK.FeedbackSheet(onDismiss = { showFeedback = false })
+     *     FeedRailSDK.FeedbackScreen(onDismiss = { showFeedback = false })
      * }
      * ```
+     *
+     * [onDismiss] fires when the user closes the experience from its root screen —
+     * either with the close button or the system back gesture. Back on any screen below
+     * the root navigates back within the feedback UI instead, so this is never called
+     * mid-flow.
+     *
+     * To embed the experience as a destination in your own navigation graph rather than
+     * overlaying it, use [com.feedrail.sdk.ui.FeedRailFeedbackContent] directly.
      */
     @Composable
-    fun FeedbackSheet(
+    fun FeedbackScreen(
         onDismiss: () -> Unit = {},
         onFeedbackSubmitted: () -> Unit = {},
     ) {
-        FeedRailBottomSheet(
+        FeedRailFeedbackDialog(
             sdk = this,
             onDismiss = onDismiss,
             onFeedbackSubmitted = onFeedbackSubmitted,
@@ -211,12 +220,48 @@ object FeedRailSDK {
     }
 
     /**
-     * Presents the feedback UI from a non-Compose host by launching a
-     * transparent [com.feedrail.sdk.ui.FeedRailActivity] over the current screen.
+     * The feedback experience, laid out to fill whatever space you give it.
+     *
+     * Use this when FeedRail is a destination in your own navigation graph. For the
+     * common case of overlaying it on the current screen, use [FeedbackScreen].
+     */
+    @Composable
+    fun FeedbackContent(
+        onDismiss: () -> Unit = {},
+        onFeedbackSubmitted: () -> Unit = {},
+    ) {
+        FeedRailFeedbackContent(
+            sdk = this,
+            onDismiss = onDismiss,
+            onFeedbackSubmitted = onFeedbackSubmitted,
+        )
+    }
+
+    @Deprecated(
+        message = "The feedback UI is now a full screen rather than a bottom sheet — a " +
+            "multi-screen flow with its own navigation is a task, not a modal, and as a " +
+            "sheet it was drag-dismissable from every screen and swallowed the back " +
+            "button. This still works and presents the new full-screen UI.",
+        replaceWith = ReplaceWith("FeedbackScreen(onDismiss, onFeedbackSubmitted)"),
+    )
+    @Composable
+    fun FeedbackSheet(
+        onDismiss: () -> Unit = {},
+        onFeedbackSubmitted: () -> Unit = {},
+    ) {
+        FeedbackScreen(
+            onDismiss = onDismiss,
+            onFeedbackSubmitted = onFeedbackSubmitted,
+        )
+    }
+
+    /**
+     * Presents the feedback UI from a non-Compose host by launching
+     * [com.feedrail.sdk.ui.FeedRailActivity] over the current screen.
      *
      * This is the entry point used by cross-platform wrappers (Flutter, React
      * Native) and by plain-View apps that don't host their own Compose tree.
-     * Prefer passing an `Activity` as [context] so the sheet appears over it;
+     * Prefer passing an `Activity` as [context] so the screen appears over it;
      * an application context works too but starts a new task.
      *
      * @throws IllegalStateException if [configure] has not been called.

@@ -24,15 +24,18 @@ fun FeedbackRowItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    ElevatedCard(
+    // Tonal, not elevated. A shadow under every row meant a dozen shadows stacked down
+    // the feed, which read as noise rather than hierarchy; a container one tonal step
+    // off the background separates the cards without any of that weight. The vertical
+    // padding is gone too — it stacked on the list's own 12dp spacing and pushed the
+    // real gap to 20dp, which is what made the feed feel both heavy and sparse.
+    Card(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
-        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     ) {
         Column(

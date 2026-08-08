@@ -175,6 +175,16 @@ fun FeedRailTheme(
                 onSurface = Color.White,
                 background = Color(0xFF000000),
                 onBackground = Color.White,
+                // Cards separate themselves from the background tonally rather than
+                // with a shadow, so these roles have to be a deliberate ladder above
+                // the background instead of the baseline scheme's purple-tinted
+                // defaults. Only devices below API 31 reach this branch; above it the
+                // dynamic scheme supplies its own ladder.
+                surfaceContainerLowest = Color(0xFF0A0A0A),
+                surfaceContainerLow = Color(0xFF161616),
+                surfaceContainer = Color(0xFF1C1C1C),
+                surfaceContainerHigh = Color(0xFF242424),
+                surfaceContainerHighest = Color(0xFF2C2C2C),
                 outlineVariant = accentColor.copy(alpha = 0.1f)
             )
         } else {
@@ -188,6 +198,13 @@ fun FeedRailTheme(
                 onSurface = Color(0xFF121212),
                 background = Color(0xFFF8F9FA),
                 onBackground = Color(0xFF121212),
+                // See the dark scheme above: a deliberate ladder, lightest at the top,
+                // so a card sits one clear step off the F8F9FA background.
+                surfaceContainerLowest = Color.White,
+                surfaceContainerLow = Color.White,
+                surfaceContainer = Color(0xFFF1F3F5),
+                surfaceContainerHigh = Color(0xFFEAEDF0),
+                surfaceContainerHighest = Color(0xFFE3E7EB),
                 outlineVariant = accentColor.copy(alpha = 0.05f)
             )
         }

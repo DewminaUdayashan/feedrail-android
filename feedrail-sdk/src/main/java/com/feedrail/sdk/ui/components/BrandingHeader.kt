@@ -1,6 +1,7 @@
 package com.feedrail.sdk.ui.components
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,12 +22,14 @@ fun BrandingHeader(
     branding: FeedRailBranding?,
     title: String,
     modifier: Modifier = Modifier,
+    alignment: Alignment = Alignment.Center,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp),
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.Center,
+            .padding(contentPadding),
+        contentAlignment = alignment,
     ) {
         val logoUrl = branding?.logoUrl
         if (!logoUrl.isNullOrBlank()) {

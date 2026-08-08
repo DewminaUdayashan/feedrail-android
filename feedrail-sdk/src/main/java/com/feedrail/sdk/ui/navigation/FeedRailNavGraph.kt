@@ -1,9 +1,11 @@
 package com.feedrail.sdk.ui.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Campaign
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.outlined.Campaign
@@ -15,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -100,6 +103,27 @@ fun FeedRailNavGraph(
     val currentRoute = navBackStack?.destination?.route
 
     val isTabScreen = currentRoute in tabRoutes
+    val isRootScreen = currentRoute == FeedRailRoute.FEEDBACK_LIST
+
+    // Back below the root navigates within the feedback UI, back on a secondary tab
+    // returns to the feedback list, and only back on the list itself leaves. NavHost
+    // already handles the first case, so this handler runs on tab screens only — it
+    // exists because the UI used to live in a ModalBottomSheet, which consumed back and
+    // tore down the whole back stack from wherever the user happened to be.
+    BackHandler(enabled = isTabScreen) {
+        if (isRootScreen) onDismiss() else navController.popBackStack()
+    }
+
+    val topBarScrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    // Navigating to a detail screen unmounts the bar. Reset it so coming back doesn't
+    // land on a collapsed header with the list already scrolled under it.
+    LaunchedEffect(isTabScreen) {
+        if (!isTabScreen) {
+            topBarScrollBehavior.state.heightOffset = 0f
+            topBarScrollBehavior.state.contentOffset = 0f
+        }
+    }
+
     // Language selection infra is kept but not surfaced in the UI until
     // localization ships (see the hidden LanguageSelectorDialog below).
     var showLanguageDialog by remember { mutableStateOf(false) }
@@ -173,44 +197,70 @@ fun FeedRailNavGraph(
                             .fillMaxSize()
                             .align(Alignment.TopCenter)
                             .then(contentWidthModifier)
+                            .then(
+                                if (isTabScreen) {
+                                    Modifier.nestedScroll(topBarScrollBehavior.nestedScrollConnection)
+                                } else {
+                                    Modifier
+                                }
+                            )
                     ) {
                         // Custom Header if it's a tab screen and NOT in a global error state
                         // Note: Screen-level errors are handled within the screen, but we check feedbackListState here as a heuristic.
                         val isError = feedbackListState.error != null && feedbackListState.items.isEmpty()
-                        
-                        if (isTabScreen && !isError) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            BrandingHeader(
-                                branding = feedbackListState.branding,
-                                title = stringResource(R.string.feedrail_general_feedback),
-                                modifier = Modifier.weight(1f)
-                            )
 
-                            // Tapping the avatar opens the current user's profile.
-                            // Every user (including anonymous guests) has a hydrated
-                            // identity, so this is always available. The language
-                            // picker is intentionally hidden until localization ships.
-                            IconButton(
-                                onClick = {
-                                    currentUser?.id?.let { navController.navigate(FeedRailRoute.profile(it)) }
+                        // The bar stays up in the error state, unlike the tab toolbar
+                        // below it. There is nothing to navigate to when the feed failed
+                        // to load, but there does have to be a way out — and the close
+                        // button is now the only visible one.
+                        if (isTabScreen) {
+                            TopAppBar(
+                                title = {
+                                    BrandingHeader(
+                                        branding = feedbackListState.branding,
+                                        title = stringResource(R.string.feedrail_general_feedback),
+                                        alignment = Alignment.CenterStart,
+                                        contentPadding = PaddingValues(0.dp),
+                                    )
                                 },
-                                enabled = currentUser != null,
-                            ) {
-                                AvatarImage(
-                                    avatarUrl = currentUser?.avatarUrl,
-                                    displayName = currentUser?.displayName
-                                        ?: sdk.config.userName
-                                        ?: "?",
-                                    size = 36.dp,
-                                )
-                            }
+                                // The close button is the whole point: as a bottom sheet
+                                // the only way out was a downward drag, which is both
+                                // invisible and, on a scrollable screen, unreliable.
+                                navigationIcon = {
+                                    IconButton(onClick = onDismiss) {
+                                        Icon(
+                                            imageVector = Icons.Default.Close,
+                                            contentDescription = stringResource(R.string.feedrail_general_close),
+                                        )
+                                    }
+                                },
+                                actions = {
+                                    // Tapping the avatar opens the current user's profile.
+                                    // Every user (including anonymous guests) has a hydrated
+                                    // identity, so this is always available. The language
+                                    // picker is intentionally hidden until localization ships.
+                                    IconButton(
+                                        onClick = {
+                                            currentUser?.id?.let { navController.navigate(FeedRailRoute.profile(it)) }
+                                        },
+                                        enabled = currentUser != null,
+                                    ) {
+                                        AvatarImage(
+                                            avatarUrl = currentUser?.avatarUrl,
+                                            displayName = currentUser?.displayName
+                                                ?: sdk.config.userName
+                                                ?: "?",
+                                            size = 32.dp,
+                                        )
+                                    }
+                                },
+                                scrollBehavior = topBarScrollBehavior,
+                                colors = TopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.background,
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surface,
+                                ),
+                            )
                         }
-                    }
 
                     NavHost(
                         navController = navController,
@@ -287,6 +337,7 @@ fun FeedRailNavGraph(
                     if (showPoweredBy) {
                         PoweredByBadge(
                             modifier = Modifier
+                                .windowInsetsPadding(WindowInsets.navigationBars)
                                 .padding(bottom = if (isTabScreen && !isError) 80.dp else 16.dp)
                         )
                     }

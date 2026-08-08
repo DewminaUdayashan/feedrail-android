@@ -14,6 +14,50 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ### Changed
 
+- **The feedback UI is a full screen instead of a bottom sheet.** The whole experience —
+  list, detail, submit form, profile, and its bottom navigation — lived inside a single
+  `ModalBottomSheet`, which is a container built for one short, dismissable choice. Being
+  a multi-screen flow inside one, it inherited every sheet behaviour whether it wanted it
+  or not, and end users hit all of them:
+
+  - **A downward drag anywhere dismissed everything.** The sheet owned vertical gestures
+    for its entire subtree, so a stray swipe on the profile, a feedback detail or a
+    half-filled submit form closed the experience and destroyed the back stack with it.
+    There is no sheet now, so there is nothing to drag away.
+  - **The back button quit instead of going back.** The sheet consumed the back press
+    before navigation ever saw it. Back now does what it does everywhere else in Android:
+    on a detail, form or profile screen it returns to the list; on a secondary tab it
+    returns to the feedback tab; only on the feedback list itself does it leave. The
+    predictive-back gesture previews your app underneath while it does so.
+  - **There was no visible way out.** The list screen offered only the invisible (and, on
+    a scrollable screen, unreliable) downward drag. Every screen now has a close or back
+    button in its app bar — including the "failed to load" state, which previously hid the
+    chrome entirely and left the user with no exit at all.
+
+  Bottom sheets are still used inside the flow for what they are actually good at: the
+  sort picker is now one, replacing a dropdown menu.
+
+- **`FeedRailSDK.FeedbackSheet()` is deprecated in favour of `FeedbackScreen()`.** It
+  still works and now presents the full-screen UI, so no integration breaks; the new name
+  describes what it does. `FeedbackContent()` is also available for hosts that want to
+  embed the experience as a destination in their own navigation graph rather than overlay
+  it. `present(context)` is unchanged.
+
+- **The feed's filter controls fit on one row.** Board chips and the sort control took a
+  row each, and the sort row held nothing but a single pill against the far edge — a band
+  of empty space above every feed. The boards now scroll horizontally in the space they
+  need, fading out under a sort control pinned beside them, and a single-board project
+  drops the chips rather than showing a filter with one option.
+
+- **Feedback cards are tonal rather than elevated.** Each row carried its own drop shadow,
+  so a screenful stacked a dozen of them into visual noise. Cards now sit one tonal step
+  off the background, which separates them without the weight. Row spacing is also a
+  consistent 12dp — the card's own padding was stacking with the list's and making the
+  real gap 20dp.
+
+- **The feedback list no longer shows "Powered by FeedRail" twice** when scrolled to the
+  end. One was pinned above the toolbar and another sat at the bottom of the list.
+
 - **The feedback UI no longer opens in FeedRail's brand colour before switching to
   yours.** Branding was fetched only after the auth handshake finished, so the sheet spent
   the whole of it painted in the fallback green and then snapped to the project's real
