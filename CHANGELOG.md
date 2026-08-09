@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-08-09
+
 ### Fixed
 
 - **A nameless user's profile showed a bare "Anonymous".** Everywhere else they appear as
