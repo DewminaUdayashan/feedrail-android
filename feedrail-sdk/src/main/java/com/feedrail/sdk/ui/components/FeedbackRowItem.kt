@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.feedrail.sdk.models.FeedRailFeedbackItem
+import com.feedrail.sdk.models.FeedRailUser
 import com.feedrail.sdk.ui.theme.Color as FeedRailColor
 
 @Composable
@@ -23,6 +24,12 @@ fun FeedbackRowItem(
     item: FeedRailFeedbackItem,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    /**
+     * Author to show when the row carries none of its own. Older API deployments
+     * return a profile's own posts without repeating the author on every row, which
+     * dropped the byline entirely; the profile subject wrote everything in that list.
+     */
+    fallbackAuthor: FeedRailUser? = null,
 ) {
     // Tonal, not elevated. A shadow under every row meant a dozen shadows stacked down
     // the feed, which read as noise rather than hierarchy; a container one tonal step
@@ -141,7 +148,7 @@ fun FeedbackRowItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val author = item.author
+                    val author = item.author ?: fallbackAuthor
                     if (author != null) {
                         AvatarImage(
                             avatarUrl = author.avatarUrl,

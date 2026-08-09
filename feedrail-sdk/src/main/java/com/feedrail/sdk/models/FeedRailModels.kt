@@ -18,15 +18,29 @@ data class FeedRailUser(
     val isPaidCustomer: Boolean? = null,
     val productId: String? = null,
 ) {
+    /**
+     * Falls back to "Anonymous · " plus a short id suffix when the user never told
+     * us who they are, so two nameless users in one thread are still distinguishable
+     * — a bare "Anonymous" made a thread read as one person talking to themselves.
+     * Matches the name the API computes for feedback and comments, so the same user
+     * is labelled identically on endpoints that apply it server-side and ones that
+     * do not.
+     */
     val displayName: String
         get() {
             if (!name.isNullOrBlank()) return name
             val full = listOfNotNull(firstName, lastName).joinToString(" ")
-            return if (full.isNotBlank()) full else "Anonymous"
+            return if (full.isNotBlank()) full else anonymousDisplayName(id)
         }
 
     val isGuestUser: Boolean get() = isGuest ?: false
     val isPaid: Boolean get() = isPaidCustomer ?: false
+}
+
+/** Shared fallback for a nameless end user. Mirrors the API's `anonymousDisplayName`. */
+internal fun anonymousDisplayName(id: String): String {
+    val suffix = id.takeLast(4)
+    return if (suffix.isEmpty()) "Anonymous" else "Anonymous · $suffix"
 }
 
 @JsonClass(generateAdapter = true)
@@ -49,14 +63,27 @@ data class FeedRailUserProfile(
     val isGuest: Boolean? = null,
     @Json(name = "_count") val count: FeedRailUserCount,
 ) {
+    /** See [FeedRailUser.displayName]. */
     val displayName: String
         get() {
             if (!name.isNullOrBlank()) return name
             val full = listOfNotNull(firstName, lastName).joinToString(" ")
-            return if (full.isNotBlank()) full else "Anonymous"
+            return if (full.isNotBlank()) full else anonymousDisplayName(id)
         }
 
     val isGuestUser: Boolean get() = isGuest ?: false
+
+    /** The profile subject as an author, for activity rows that carry none. */
+    fun asAuthor(): FeedRailUser = FeedRailUser(
+        id = id,
+        externalId = externalId,
+        name = name,
+        firstName = firstName,
+        lastName = lastName,
+        email = email,
+        avatarUrl = avatarUrl,
+        isGuest = isGuest,
+    )
 }
 
 @JsonClass(generateAdapter = true)

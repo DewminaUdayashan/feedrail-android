@@ -176,6 +176,7 @@ fun ProfileScreen(
                                         item = item,
                                         onClick = { onFeedbackClick(item.id) },
                                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                        fallbackAuthor = profile.asAuthor(),
                                     )
                                 }
                             }
@@ -201,7 +202,7 @@ fun ProfileScreen(
                                     verticalArrangement = Arrangement.spacedBy(16.dp),
                                 ) {
                                     commentList.forEach { comment ->
-                                        CommentItem(comment = comment)
+                                        CommentItem(comment = comment, fallbackAuthor = profile.asAuthor())
                                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
                                     }
                                 }

@@ -12,6 +12,19 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Fixed
+
+- **A nameless user's profile showed a bare "Anonymous".** Everywhere else they appear as
+  "Anonymous · 9f3a", with a short id suffix that keeps two of them apart — so a profile
+  disagreed with the post the reader had just tapped through from. The suffix now comes
+  from the model, matching the name the API computes for feedback and comments.
+
+- **Rows in a profile's Requests tab had no byline at all, and its Comments tab said
+  "Anonymous".** The activity endpoints return a user's own posts without repeating the
+  author on each row, so there was nothing to draw. The API now sends the author, and both
+  lists fall back to the profile's own user against older deployments — they wrote
+  everything in those lists by definition.
+
 ## [0.7.1] - 2026-08-08
 
 ### Fixed

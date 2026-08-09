@@ -15,10 +15,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.feedrail.sdk.R
 import com.feedrail.sdk.models.FeedRailComment
+import com.feedrail.sdk.models.FeedRailUser
 import com.feedrail.sdk.models.FeedRailAttachment
 
 @Composable
@@ -27,8 +30,10 @@ fun CommentItem(
     baseUrl: String = "",
     isReply: Boolean = false,
     modifier: Modifier = Modifier,
+    /** See [FeedbackRowItem]. Applies to the comment itself; replies carry their own. */
+    fallbackAuthor: FeedRailUser? = null,
 ) {
-    val author = comment.author
+    val author = comment.author ?: fallbackAuthor
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -41,7 +46,7 @@ fun CommentItem(
         ) {
             AvatarImage(
                 avatarUrl = author?.avatarUrl,
-                displayName = author?.displayName ?: "Anonymous",
+                displayName = author?.displayName ?: stringResource(R.string.feedrail_general_anonymous),
                 size = if (isReply) 28.dp else 32.dp,
             )
 
@@ -53,7 +58,7 @@ fun CommentItem(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
-                        text = author?.displayName ?: "Anonymous",
+                        text = author?.displayName ?: stringResource(R.string.feedrail_general_anonymous),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 13.sp,
                     )
