@@ -57,22 +57,44 @@ fun FeedbackListScreen(
         if (shouldLoadMore) viewModel.loadMore()
     }
 
+    // A reader who submitted from halfway down the feed would otherwise be left
+    // looking at where they were, not at what they just wrote.
+    LaunchedEffect(uiState.highlightedItemId) {
+        if (uiState.highlightedItemId != null) listState.animateScrollToItem(0)
+    }
+
     val currentSortLabel = sortOptions.firstOrNull { it.key == uiState.sortOption }
         ?.let { stringResource(it.labelResId) }
         ?: stringResource(R.string.feedrail_feedback_list_sort_top)
 
     Column(modifier = modifier.fillMaxSize()) {
-        // Board filter chips and Sort row (only if NOT in a global error state)
+        // Board filter chips and Sort row.
+        //
+        // Deliberately not conditioned on the loading state. Selecting a board
+        // clears the list and reloads it, which used to satisfy "initial loading"
+        // and take this bar down with it — so the control the reader had just
+        // pressed vanished under their finger and came back a moment later. Only
+        // the posts have anything to reload. It still hides before the first load
+        // finishes, and on an empty single-board feed where a lone sort control
+        // over nothing is just clutter.
         val isErrorState = uiState.error != null && uiState.items.isEmpty()
-        val isInitialLoading = (uiState.isLoading || !uiState.hasLoadedOnce) && uiState.items.isEmpty()
-        
-        if (!isErrorState && !isInitialLoading && (uiState.items.isNotEmpty() || uiState.boards.size > 1)) {
+
+        if (!isErrorState && uiState.hasLoadedOnce &&
+            (uiState.items.isNotEmpty() || uiState.boards.size > 1)
+        ) {
             FeedbackFilterBar(
                 boards = uiState.boards,
                 selectedSlug = uiState.selectedBoardSlug,
                 onSelectBoard = viewModel::selectBoard,
                 sortLabel = currentSortLabel,
                 onSortClick = { showSortSheet = true },
+            )
+        }
+
+        uiState.submissionNotice?.let { notice ->
+            SubmissionNoticeBanner(
+                status = notice.status,
+                onDismiss = viewModel::dismissSubmissionNotice,
             )
         }
 
@@ -153,6 +175,10 @@ fun FeedbackListScreen(
                                 FeedbackRowItem(
                                     item = item,
                                     onClick = { onFeedbackClick(item.id) },
+                                    // Tints the post the reader has just written, so
+                                    // the banner's "at the top of the list" has
+                                    // something to point at.
+                                    highlighted = uiState.highlightedItemId == item.id,
                                 )
                             }
 

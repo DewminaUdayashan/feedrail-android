@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.feedrail.sdk.R
 import com.feedrail.sdk.models.FeedRailBoard
+import com.feedrail.sdk.models.FeedRailFeedbackItem
 import com.feedrail.sdk.ui.viewmodels.SubmitFeedbackViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +36,7 @@ fun SubmitFeedbackScreen(
     viewModel: SubmitFeedbackViewModel,
     boards: List<FeedRailBoard>,
     onBack: () -> Unit,
-    onSuccess: () -> Unit,
+    onSuccess: (FeedRailFeedbackItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

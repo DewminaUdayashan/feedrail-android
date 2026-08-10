@@ -297,8 +297,13 @@ fun FeedRailNavGraph(
                                 viewModel = vm,
                                 boards = feedbackListState.boards,
                                 onBack = { navController.popBackStack() },
-                                onSuccess = {
+                                onSuccess = { created ->
                                     onFeedbackSubmitted()
+                                    // The list takes the new post straight from the
+                                    // create response — see `onFeedbackSubmitted` on
+                                    // the list view model for why a reload was not
+                                    // enough (and why there was no reload at all).
+                                    feedbackListVm.onFeedbackSubmitted(created)
                                     navController.popBackStack()
                                 },
                             )

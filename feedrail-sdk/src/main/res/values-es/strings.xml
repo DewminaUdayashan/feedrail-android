@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">Idioma</string>
     <string name="feedrail_settings_language_title">Seleccionar idioma</string>
     <string name="feedrail_feedback_submit_cta">Enviar comentario</string>
+    <string name="feedrail_feedback_submit_notice_posted">Publicado: tu comentario ya está al principio de la lista.</string>
+    <string name="feedrail_feedback_submit_notice_pending">Recibido: pendiente de revisión del equipo. Solo tú puedes verlo hasta que se apruebe, y permanece al principio de tu lista.</string>
 </resources>

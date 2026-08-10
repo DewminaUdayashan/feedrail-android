@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">اللغة</string>
     <string name="feedrail_settings_language_title">اختر اللغة</string>
     <string name="feedrail_feedback_submit_cta">إرسال تعليق</string>
+    <string name="feedrail_feedback_submit_notice_posted">تم النشر — ملاحظتك الآن في أعلى القائمة.</string>
+    <string name="feedrail_feedback_submit_notice_pending">تم الاستلام — في انتظار مراجعة الفريق. لا يمكن لأحد غيرك رؤيتها حتى تتم الموافقة عليها، وتبقى في أعلى قائمتك.</string>
 </resources>

@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">言語</string>
     <string name="feedrail_settings_language_title">言語を選択</string>
     <string name="feedrail_feedback_submit_cta">フィードバックを送信</string>
+    <string name="feedrail_feedback_submit_notice_posted">投稿しました。リストの先頭に表示されています。</string>
+    <string name="feedrail_feedback_submit_notice_pending">受け付けました。チームの確認待ちです。承認されるまではあなただけに表示され、リストの先頭に残ります。</string>
 </resources>
