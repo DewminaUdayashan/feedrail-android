@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-08-10
+
 ### Fixed
 
 - **Tapping a board filter took the filter bar off screen.** Selecting a board clears
