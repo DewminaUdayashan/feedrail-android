@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">Langue</string>
     <string name="feedrail_settings_language_title">Sélectionner une langue</string>
     <string name="feedrail_feedback_submit_cta">Soumettre un retour</string>
+    <string name="feedrail_feedback_submit_notice_posted">Publié — votre retour se trouve désormais en haut de la liste.</string>
+    <string name="feedrail_feedback_submit_notice_pending">Bien reçu — en attente de validation par l\'équipe. Vous seul pouvez le voir jusqu\'à son approbation, et il reste en haut de votre liste.</string>
 </resources>

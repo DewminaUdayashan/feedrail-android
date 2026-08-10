@@ -30,6 +30,8 @@ fun FeedbackRowItem(
      * dropped the byline entirely; the profile subject wrote everything in that list.
      */
     fallbackAuthor: FeedRailUser? = null,
+    /** Tints the row — used for the post the reader has just submitted. */
+    highlighted: Boolean = false,
 ) {
     // Tonal, not elevated. A shadow under every row meant a dozen shadows stacked down
     // the feed, which read as noise rather than hierarchy; a container one tonal step
@@ -42,7 +44,11 @@ fun FeedbackRowItem(
         shape = MaterialTheme.shapes.large,
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            containerColor = if (highlighted) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
         ),
     ) {
         Column(

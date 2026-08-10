@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">語言</string>
     <string name="feedrail_settings_language_title">選擇語言</string>
     <string name="feedrail_feedback_submit_cta">提交回饋</string>
+    <string name="feedrail_feedback_submit_notice_posted">已發布，你的回饋現在位於清單頂端。</string>
+    <string name="feedrail_feedback_submit_notice_pending">已收到，正在等待團隊審核。通過審核前僅你可見，並會保留在清單頂端。</string>
 </resources>

@@ -12,6 +12,7 @@ import com.feedrail.sdk.auth.AuthManager
 import com.feedrail.sdk.auth.AuthState
 import com.feedrail.sdk.models.AttachmentInput
 import com.feedrail.sdk.models.FeedRailBoard
+import com.feedrail.sdk.models.FeedRailFeedbackItem
 import com.feedrail.sdk.models.StagedAttachment
 import com.feedrail.sdk.models.SubmitFeedbackBody
 import com.feedrail.sdk.`public`.FeedRailSDK
@@ -124,7 +125,11 @@ class SubmitFeedbackViewModel(
         )
     }
 
-    fun submit(onSuccess: () -> Unit) {
+    /**
+     * Posts the feedback and hands the created item back, so the list can show it
+     * without re-fetching and can say whether it still needs review.
+     */
+    fun submit(onSuccess: (FeedRailFeedbackItem) -> Unit) {
         val s = _uiState.value
         if (!s.canSubmit) return
         viewModelScope.launch {
@@ -135,7 +140,7 @@ class SubmitFeedbackViewModel(
                         AttachmentInput(r.storageKey, r.fileName, r.mimeType, r.fileSize)
                     }
                 }
-                apiClient.call {
+                val created = apiClient.call {
                     submitFeedback(
                         SubmitFeedbackBody(
                             title = s.title.trim(),
@@ -146,7 +151,7 @@ class SubmitFeedbackViewModel(
                     )
                 }
                 _uiState.value = _uiState.value.copy(isSubmitting = false, isSubmitted = true)
-                onSuccess()
+                onSuccess(created)
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isSubmitting = false, error = e.message)
             }

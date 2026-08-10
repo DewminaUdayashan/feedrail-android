@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">Lingua</string>
     <string name="feedrail_settings_language_title">Seleziona lingua</string>
     <string name="feedrail_feedback_submit_cta">Invia feedback</string>
+    <string name="feedrail_feedback_submit_notice_posted">Pubblicato: il tuo feedback è ora in cima all\'elenco.</string>
+    <string name="feedrail_feedback_submit_notice_pending">Ricevuto: in attesa della revisione del team. Fino all\'approvazione lo vedi solo tu e resta in cima al tuo elenco.</string>
 </resources>

@@ -12,7 +12,22 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
-## [0.7.2] - 2026-08-09
+### Fixed
+
+- **Tapping a board filter took the filter bar off screen.** Selecting a board clears
+  the list and reloads it, which counted as "still loading" — and the bar was hidden
+  while loading, so the control the reader had just pressed vanished under their
+  finger and came back a moment later. The bar now stays put through a reload, with
+  the current board still selected, while only the posts below it change.
+
+- **A submitted post never appeared.** The screen popped back to a feed that was
+  never refreshed, so the post was simply not there — and a refresh would not have
+  been enough either: the default order is Top Voted, so a new post with one vote
+  sorts pages down, and a post awaiting review is not returned to anybody but its
+  author. The new post now goes straight to the top of the list, tinted, with a
+  banner saying it was received — and, when the project moderates submissions, that
+  it is waiting for review and only visible to its author until approved. It stays at
+  the top through a refresh or a sort change for as long as that banner is up.
 
 ### Fixed
 

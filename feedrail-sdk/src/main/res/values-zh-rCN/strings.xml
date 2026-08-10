@@ -65,4 +65,6 @@
     <string name="feedrail_settings_language">语言</string>
     <string name="feedrail_settings_language_title">选择语言</string>
     <string name="feedrail_feedback_submit_cta">提交反馈</string>
+    <string name="feedrail_feedback_submit_notice_posted">已发布，你的反馈现在位于列表顶部。</string>
+    <string name="feedrail_feedback_submit_notice_pending">已收到，正在等待团队审核。通过审核前仅你可见，并会保留在列表顶部。</string>
 </resources>

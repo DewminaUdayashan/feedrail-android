@@ -12,7 +12,10 @@ import com.feedrail.sdk.auth.AuthState
 import com.feedrail.sdk.models.FeedRailBoard
 import com.feedrail.sdk.models.FeedRailBranding
 import com.feedrail.sdk.models.FeedRailFeedbackItem
+import com.feedrail.sdk.models.FeedRailModerationStatus
 import com.feedrail.sdk.`public`.FeedRailSDK
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,6 +41,10 @@ data class FeedbackListUiState(
     /** False until the first feedback load finishes — lets the UI show the
      * skeleton from the first frame instead of flashing the empty state. */
     val hasLoadedOnce: Boolean = false,
+    /** The post the reader has just submitted, and how it was received. */
+    val submissionNotice: SubmissionNotice? = null,
+    /** That post's id, tinted in the list so it can be found at a glance. */
+    val highlightedItemId: String? = null,
 ) {
     val hasMore: Boolean get() = currentPage < totalPages
 
@@ -47,6 +54,12 @@ data class FeedbackListUiState(
         get() = isAuthenticated && (!isGuest || (branding?.guestPostingAllowed ?: false))
 }
 
+/** A just-submitted post and its review state, for the confirmation banner. */
+data class SubmissionNotice(
+    val id: String,
+    val status: FeedRailModerationStatus?,
+)
+
 class FeedbackListViewModel(
     private val apiClient: FeedRailApiClient,
     private val authManager: AuthManager,
@@ -54,6 +67,10 @@ class FeedbackListViewModel(
 
     private val _uiState = MutableStateFlow(FeedbackListUiState())
     val uiState: StateFlow<FeedbackListUiState> = _uiState.asStateFlow()
+
+    /** Kept so the post survives a reload that would otherwise drop it. */
+    private var justSubmitted: FeedRailFeedbackItem? = null
+    private var noticeJob: Job? = null
 
     init {
         // Branding is deliberately NOT waited on auth. `/portal/boards` needs no
@@ -142,7 +159,7 @@ class FeedbackListViewModel(
                     )
                 }
                 _uiState.value = _uiState.value.copy(
-                    items = response.items,
+                    items = withJustSubmitted(response.items),
                     currentPage = response.meta.page,
                     totalPages = response.meta.totalPages,
                     isLoading = false,
@@ -168,7 +185,7 @@ class FeedbackListViewModel(
                     getFeedback(page = 1, limit = 20, boardSlugs = s.selectedBoardSlug, sort = s.sortOption)
                 }
                 _uiState.value = _uiState.value.copy(
-                    items = response.items,
+                    items = withJustSubmitted(response.items),
                     currentPage = response.meta.page,
                     totalPages = response.meta.totalPages,
                     isRefreshing = false,
@@ -194,7 +211,10 @@ class FeedbackListViewModel(
                     )
                 }
                 _uiState.value = _uiState.value.copy(
-                    items = s.items + response.items,
+                    // Deduplicated: a just-submitted post pinned to the top also
+                    // arrives in whichever page its own sort position falls on,
+                    // and two rows with the same key crash a LazyColumn.
+                    items = (s.items + response.items).distinctBy { it.id },
                     currentPage = response.meta.page,
                     totalPages = response.meta.totalPages,
                     isLoadingMore = false,
@@ -215,6 +235,58 @@ class FeedbackListViewModel(
         loadInitial()
     }
 
+    /**
+     * Puts a post the reader has just written at the top of the list.
+     *
+     * Submitting used to leave the feed exactly as it was — the screen popped back
+     * to an unchanged list and nothing said the post had been accepted. Even a
+     * refresh would not have helped: the default order is Top Voted, so a new post
+     * with one vote sorts wherever its votes put it — usually pages down — and a
+     * post awaiting review is not shown to anyone but its author at all.
+     */
+    fun onFeedbackSubmitted(item: FeedRailFeedbackItem) {
+        justSubmitted = item
+        // The notice goes in first: the merge below is a no-op while it is absent,
+        // which is how pinning stops once the reader dismisses the banner.
+        _uiState.value = _uiState.value.copy(
+            highlightedItemId = item.id,
+            submissionNotice = SubmissionNotice(item.id, item.moderationState),
+        )
+        _uiState.value = _uiState.value.copy(items = withJustSubmitted(_uiState.value.items))
+
+        noticeJob?.cancel()
+        noticeJob = viewModelScope.launch {
+            delay(NOTICE_LIFETIME_MS)
+            if (_uiState.value.submissionNotice?.id == item.id) dismissSubmissionNotice()
+        }
+    }
+
+    fun dismissSubmissionNotice() {
+        noticeJob?.cancel()
+        justSubmitted = null
+        _uiState.value = _uiState.value.copy(submissionNotice = null, highlightedItemId = null)
+    }
+
+    /**
+     * Keeps the just-submitted post at the top of a freshly fetched page.
+     *
+     * A pull-to-refresh or a sort change re-asks the server, which sorts the new
+     * post like everything else and may not return it on the first page at all.
+     * While the confirmation is still on screen the banner promises the reader it
+     * is at the top, so it stays there — but the server's copy wins whenever it is
+     * present, so the row never goes stale.
+     */
+    private fun withJustSubmitted(fetched: List<FeedRailFeedbackItem>): List<FeedRailFeedbackItem> {
+        val submitted = justSubmitted ?: return fetched
+        if (_uiState.value.submissionNotice == null) return fetched
+        // A board filter the post does not belong to is a deliberate "show me
+        // something else" — pinning it there would be noise, not reassurance.
+        val slug = _uiState.value.selectedBoardSlug
+        if (slug != null && submitted.board?.slug != slug) return fetched
+        val server = fetched.firstOrNull { it.id == submitted.id }
+        return listOf(server ?: submitted) + fetched.filter { it.id != submitted.id }
+    }
+
     fun updateItemVote(itemId: String, voted: Boolean, voteCount: Int) {
         _uiState.value = _uiState.value.copy(
             items = _uiState.value.items.map { item ->
@@ -227,6 +299,9 @@ class FeedbackListViewModel(
     }
 
     companion object {
+        /** Long enough to read the confirmation, short enough not to become furniture. */
+        private const val NOTICE_LIFETIME_MS = 12_000L
+
         fun factory(sdk: FeedRailSDK): ViewModelProvider.Factory = viewModelFactory {
             initializer { FeedbackListViewModel(sdk.apiClient, sdk.authManager) }
         }

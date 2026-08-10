@@ -124,4 +124,6 @@
     <string name="feedrail_moderation_pending_explanation">Only you can see this until the team approves it.</string>
     <string name="feedrail_moderation_rejected">Rejected</string>
     <string name="feedrail_moderation_rejected_explanation">This post was not approved and is only visible to you.</string>
+    <string name="feedrail_feedback_submit_notice_posted">Posted — your feedback is now at the top of the list.</string>
+    <string name="feedrail_feedback_submit_notice_pending">Received — waiting for the team\'s review. Only you can see it until it is approved, and it stays at the top of your list.</string>
 </resources>
