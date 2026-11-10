@@ -153,10 +153,19 @@ data class FeedRailComment(
     val moderationStatus: String? = null,
     /** Why the comment was rejected, when the team supplied a reason. */
     val rejectionReason: String? = null,
+    /** Written by the team's AI agent. The portal API filters these out today. */
+    val isAiComment: Boolean? = null,
     val createdAt: String,
 ) {
     val author: FeedRailUser? get() = orgUser ?: user
     val isVerified: Boolean get() = orgUser != null
+
+    /**
+     * The end user who wrote this comment, when it is one — the only kind of author
+     * that can be reported or blocked. Null for team members and the AI agent.
+     */
+    val endUserAuthor: FeedRailUser?
+        get() = if (orgUser != null || isAiComment == true) null else user
 
     /** [moderationStatus] mapped to a known case, or null if absent/unrecognised. */
     val moderationState: FeedRailModerationStatus?
@@ -202,6 +211,10 @@ data class FeedRailFeedbackItem(
     val voteCount: Int get() = count?.votes ?: 0
     val commentCount: Int get() = count?.comments ?: 0
     val author: FeedRailUser? get() = if (isTeamPost) orgUser else user
+
+    /** The end user who wrote this post, or null for a team post. See [FeedRailComment.endUserAuthor]. */
+    val endUserAuthor: FeedRailUser?
+        get() = if (isTeamPost || orgUser != null) null else user
 
     /** [moderationStatus] mapped to a known case, or null if absent/unrecognised. */
     val moderationState: FeedRailModerationStatus?
@@ -336,4 +349,39 @@ data class FeedRailUploadResponse(
     val fileName: String,
     val mimeType: String,
     val fileSize: Int,
+)
+
+// ── Report & Block ────────────────────────────────────────────────────────────
+
+/** Why a post or comment is being reported. Sent as the enum name. */
+enum class FeedRailReportReason {
+    SPAM,
+    HARASSMENT,
+    HATE,
+    SEXUAL,
+    VIOLENCE,
+    OTHER,
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailReportResponse(
+    val id: String,
+    val status: String,
+)
+
+@JsonClass(generateAdapter = true)
+data class FeedRailBlockedUser(
+    val id: String,
+    val name: String? = null,
+    val avatarUrl: String? = null,
+) {
+    val displayName: String
+        get() = if (!name.isNullOrBlank()) name else anonymousDisplayName(id)
+}
+
+@JsonClass(generateAdapter = true)
+data class FeedRailBlockedUserEntry(
+    val id: String,
+    val createdAt: String,
+    val blockedUser: FeedRailBlockedUser,
 )

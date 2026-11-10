@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">إرسال تعليق</string>
     <string name="feedrail_feedback_submit_notice_posted">تم النشر — ملاحظتك الآن في أعلى القائمة.</string>
     <string name="feedrail_feedback_submit_notice_pending">تم الاستلام — في انتظار مراجعة الفريق. لا يمكن لأحد غيرك رؤيتها حتى تتم الموافقة عليها، وتبقى في أعلى قائمتك.</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">خيارات أخرى</string>
+    <string name="feedrail_report_action">إبلاغ…</string>
+    <string name="feedrail_report_title">الإبلاغ عن محتوى</string>
+    <string name="feedrail_report_message">لماذا تبلغ عن هذا؟ سيراجعه الفريق، وسيُخفى عنك فورًا.</string>
+    <string name="feedrail_report_reason_spam">رسائل مزعجة</string>
+    <string name="feedrail_report_reason_harassment">تحرش أو تنمر</string>
+    <string name="feedrail_report_reason_hate">خطاب كراهية</string>
+    <string name="feedrail_report_reason_sexual">محتوى جنسي</string>
+    <string name="feedrail_report_reason_violence">عنف أو تهديد</string>
+    <string name="feedrail_report_reason_other">سبب آخر</string>
+    <string name="feedrail_report_note_label">أضف تفاصيل (اختياري)</string>
+    <string name="feedrail_report_submit">إبلاغ</string>
+    <string name="feedrail_report_success">شكرًا على الإبلاغ. سيراجعه الفريق.</string>
+    <string name="feedrail_block_action">حظر %1$s</string>
+    <string name="feedrail_block_confirm_title">حظر %1$s؟</string>
+    <string name="feedrail_block_confirm_message">لن ترى منشوراته أو تعليقاته بعد الآن. لن يتم إشعاره. يمكنك إلغاء الحظر من ملفك الشخصي.</string>
+    <string name="feedrail_block_confirm_button">حظر</string>
+    <string name="feedrail_block_success">تم حظر %1$s</string>
+    <string name="feedrail_unblock_action">إلغاء الحظر</string>
+    <string name="feedrail_unblock_success">تم إلغاء حظر %1$s</string>
+    <string name="feedrail_blocked_users_title">المستخدمون المحظورون</string>
+    <string name="feedrail_blocked_users_empty">لم تحظر أي شخص.</string>
+    <string name="feedrail_error_banned">لم يعد بإمكانك النشر أو التعليق هنا.</string>
 </resources>

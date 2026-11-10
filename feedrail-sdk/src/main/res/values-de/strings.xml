@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">Feedback einreichen</string>
     <string name="feedrail_feedback_submit_notice_posted">Veröffentlicht – dein Feedback steht jetzt oben in der Liste.</string>
     <string name="feedrail_feedback_submit_notice_pending">Eingegangen – wartet auf die Prüfung durch das Team. Bis zur Freigabe siehst nur du es, und es bleibt oben in deiner Liste.</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">Weitere Optionen</string>
+    <string name="feedrail_report_action">Melden…</string>
+    <string name="feedrail_report_title">Inhalt melden</string>
+    <string name="feedrail_report_message">Warum meldest du das? Das Team prüft es, und für dich wird es sofort ausgeblendet.</string>
+    <string name="feedrail_report_reason_spam">Spam</string>
+    <string name="feedrail_report_reason_harassment">Belästigung oder Mobbing</string>
+    <string name="feedrail_report_reason_hate">Hassrede</string>
+    <string name="feedrail_report_reason_sexual">Sexuelle Inhalte</string>
+    <string name="feedrail_report_reason_violence">Gewalt oder Drohungen</string>
+    <string name="feedrail_report_reason_other">Etwas anderes</string>
+    <string name="feedrail_report_note_label">Details hinzufügen (optional)</string>
+    <string name="feedrail_report_submit">Melden</string>
+    <string name="feedrail_report_success">Danke für die Meldung. Das Team prüft sie.</string>
+    <string name="feedrail_block_action">%1$s blockieren</string>
+    <string name="feedrail_block_confirm_title">%1$s blockieren?</string>
+    <string name="feedrail_block_confirm_message">Du siehst ihre Beiträge und Kommentare nicht mehr. Sie werden nicht benachrichtigt. Du kannst die Blockierung in deinem Profil aufheben.</string>
+    <string name="feedrail_block_confirm_button">Blockieren</string>
+    <string name="feedrail_block_success">%1$s ist blockiert</string>
+    <string name="feedrail_unblock_action">Blockierung aufheben</string>
+    <string name="feedrail_unblock_success">%1$s ist nicht mehr blockiert</string>
+    <string name="feedrail_blocked_users_title">Blockierte Nutzer</string>
+    <string name="feedrail_blocked_users_empty">Du hast niemanden blockiert.</string>
+    <string name="feedrail_error_banned">Du kannst hier nicht mehr posten oder kommentieren.</string>
 </resources>

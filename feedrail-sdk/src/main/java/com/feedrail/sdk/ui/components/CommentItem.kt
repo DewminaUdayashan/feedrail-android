@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,10 @@ fun CommentItem(
     modifier: Modifier = Modifier,
     /** See [FeedbackRowItem]. Applies to the comment itself; replies carry their own. */
     fallbackAuthor: FeedRailUser? = null,
+    /** The post this comment belongs to. Report and block are offered only when set. */
+    feedbackId: String? = null,
 ) {
+    val moderation = LocalModerationActions.current
     val author = comment.author ?: fallbackAuthor
     Column(
         modifier = modifier
@@ -71,7 +75,18 @@ fun CommentItem(
                         text = relativeTime(comment.createdAt),
                         fontSize = 11.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
                     )
+
+                    if (feedbackId != null) {
+                        ModerationOverflowButton(
+                            author = comment.endUserAuthor,
+                            onReport = { reason, note ->
+                                moderation?.reportComment(feedbackId, comment.id, reason, note)
+                            },
+                            modifier = Modifier.size(28.dp),
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -119,6 +134,7 @@ fun CommentItem(
                         comment = reply,
                         baseUrl = baseUrl,
                         isReply = true,
+                        feedbackId = feedbackId,
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                 }

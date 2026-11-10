@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">Enviar comentario</string>
     <string name="feedrail_feedback_submit_notice_posted">Publicado: tu comentario ya está al principio de la lista.</string>
     <string name="feedrail_feedback_submit_notice_pending">Recibido: pendiente de revisión del equipo. Solo tú puedes verlo hasta que se apruebe, y permanece al principio de tu lista.</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">Más opciones</string>
+    <string name="feedrail_report_action">Denunciar…</string>
+    <string name="feedrail_report_title">Denunciar contenido</string>
+    <string name="feedrail_report_message">¿Por qué denuncias esto? El equipo lo revisará y se ocultará para ti de inmediato.</string>
+    <string name="feedrail_report_reason_spam">Spam</string>
+    <string name="feedrail_report_reason_harassment">Acoso o intimidación</string>
+    <string name="feedrail_report_reason_hate">Discurso de odio</string>
+    <string name="feedrail_report_reason_sexual">Contenido sexual</string>
+    <string name="feedrail_report_reason_violence">Violencia o amenazas</string>
+    <string name="feedrail_report_reason_other">Otro motivo</string>
+    <string name="feedrail_report_note_label">Añadir detalles (opcional)</string>
+    <string name="feedrail_report_submit">Denunciar</string>
+    <string name="feedrail_report_success">Gracias por denunciar. El equipo lo revisará.</string>
+    <string name="feedrail_block_action">Bloquear a %1$s</string>
+    <string name="feedrail_block_confirm_title">¿Bloquear a %1$s?</string>
+    <string name="feedrail_block_confirm_message">Ya no verás sus publicaciones ni comentarios. No recibirá ninguna notificación. Puedes desbloquearlo desde tu perfil.</string>
+    <string name="feedrail_block_confirm_button">Bloquear</string>
+    <string name="feedrail_block_success">%1$s está bloqueado</string>
+    <string name="feedrail_unblock_action">Desbloquear</string>
+    <string name="feedrail_unblock_success">%1$s ya no está bloqueado</string>
+    <string name="feedrail_blocked_users_title">Usuarios bloqueados</string>
+    <string name="feedrail_blocked_users_empty">No has bloqueado a nadie.</string>
+    <string name="feedrail_error_banned">Ya no puedes publicar ni comentar aquí.</string>
 </resources>

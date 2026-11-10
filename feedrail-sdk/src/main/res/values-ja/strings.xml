@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">フィードバックを送信</string>
     <string name="feedrail_feedback_submit_notice_posted">投稿しました。リストの先頭に表示されています。</string>
     <string name="feedrail_feedback_submit_notice_pending">受け付けました。チームの確認待ちです。承認されるまではあなただけに表示され、リストの先頭に残ります。</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">その他のオプション</string>
+    <string name="feedrail_report_action">報告…</string>
+    <string name="feedrail_report_title">コンテンツを報告</string>
+    <string name="feedrail_report_message">報告する理由を選んでください。チームが確認します。あなたにはすぐに非表示になります。</string>
+    <string name="feedrail_report_reason_spam">スパム</string>
+    <string name="feedrail_report_reason_harassment">嫌がらせ・いじめ</string>
+    <string name="feedrail_report_reason_hate">ヘイトスピーチ</string>
+    <string name="feedrail_report_reason_sexual">性的なコンテンツ</string>
+    <string name="feedrail_report_reason_violence">暴力・脅迫</string>
+    <string name="feedrail_report_reason_other">その他</string>
+    <string name="feedrail_report_note_label">詳細を追加（任意）</string>
+    <string name="feedrail_report_submit">報告</string>
+    <string name="feedrail_report_success">報告ありがとうございます。チームが確認します。</string>
+    <string name="feedrail_block_action">%1$s をブロック</string>
+    <string name="feedrail_block_confirm_title">%1$s をブロックしますか？</string>
+    <string name="feedrail_block_confirm_message">このユーザーの投稿やコメントは表示されなくなります。相手に通知されることはありません。プロフィールからブロックを解除できます。</string>
+    <string name="feedrail_block_confirm_button">ブロック</string>
+    <string name="feedrail_block_success">%1$s をブロックしました</string>
+    <string name="feedrail_unblock_action">ブロック解除</string>
+    <string name="feedrail_unblock_success">%1$s のブロックを解除しました</string>
+    <string name="feedrail_blocked_users_title">ブロック中のユーザー</string>
+    <string name="feedrail_blocked_users_empty">ブロックしているユーザーはいません。</string>
+    <string name="feedrail_error_banned">ここでは投稿やコメントができなくなりました。</string>
 </resources>

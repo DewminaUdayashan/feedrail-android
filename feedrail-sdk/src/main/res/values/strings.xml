@@ -126,4 +126,29 @@
     <string name="feedrail_moderation_rejected_explanation">This post was not approved and is only visible to you.</string>
     <string name="feedrail_feedback_submit_notice_posted">Posted — your feedback is now at the top of the list.</string>
     <string name="feedrail_feedback_submit_notice_pending">Received — waiting for the team\'s review. Only you can see it until it is approved, and it stays at the top of your list.</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">More options</string>
+    <string name="feedrail_report_action">Report…</string>
+    <string name="feedrail_report_title">Report content</string>
+    <string name="feedrail_report_message">Why are you reporting this? The team will review it, and it is hidden for you right away.</string>
+    <string name="feedrail_report_reason_spam">Spam</string>
+    <string name="feedrail_report_reason_harassment">Harassment or bullying</string>
+    <string name="feedrail_report_reason_hate">Hate speech</string>
+    <string name="feedrail_report_reason_sexual">Sexual content</string>
+    <string name="feedrail_report_reason_violence">Violence or threats</string>
+    <string name="feedrail_report_reason_other">Something else</string>
+    <string name="feedrail_report_note_label">Add details (optional)</string>
+    <string name="feedrail_report_submit">Report</string>
+    <string name="feedrail_report_success">Thanks for reporting. The team will review it.</string>
+    <string name="feedrail_block_action">Block %1$s</string>
+    <string name="feedrail_block_confirm_title">Block %1$s?</string>
+    <string name="feedrail_block_confirm_message">You will no longer see their posts or comments. They are not notified. You can unblock them from your profile.</string>
+    <string name="feedrail_block_confirm_button">Block</string>
+    <string name="feedrail_block_success">%1$s is blocked</string>
+    <string name="feedrail_unblock_action">Unblock</string>
+    <string name="feedrail_unblock_success">%1$s is unblocked</string>
+    <string name="feedrail_blocked_users_title">Blocked users</string>
+    <string name="feedrail_blocked_users_empty">You haven\'t blocked anyone.</string>
+    <string name="feedrail_error_banned">You can no longer post or comment here.</string>
 </resources>

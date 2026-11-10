@@ -134,6 +134,43 @@ FeedRailConfig(
 
 ---
 
+## App Store & Google Play UGC Policy
+
+Apple's [App Store Review Guideline 1.2](https://developer.apple.com/app-store/review/guidelines/#user-generated-content)
+and Google Play's [User Generated Content policy](https://support.google.com/googleplay/android-developer/answer/9876937)
+apply to any app that shows content written by other users, which FeedRail does.
+Both stores look for the same safeguards. FeedRail covers some of them, and your
+app still owes the rest.
+
+**What FeedRail provides**
+
+- **Report.** Every post and comment by another end user has **Report…**, in the ⋮ menu
+  on the detail screen and comments, and on long-press in the feed. Reports land in your
+  FeedRail dashboard for review. An item that three different people report is hidden
+  from everyone automatically.
+- **Block.** **Block <name>** on the same menus hides everything by that person from
+  the reader at once and on every later load. Readers manage and undo blocks under
+  **Blocked users** on their profile.
+- **Remove and ban.** From the dashboard your team reviews reports, removes content
+  and bans users. Banning hides everything that person wrote from everyone. A banned
+  user can still read, report and block, but every post, comment and vote is refused
+  with a clear message (`FeedRailError.Banned`).
+- **Pre-moderation**, if you turn it on for the project: new posts and comments stay
+  visible only to their author until approved.
+
+**What your app still owes**
+
+- **Terms that forbid objectionable content**, which users accept before they can post.
+  Apple asks for an EULA or terms with no tolerance for objectionable content or
+  abusive users. FeedRail doesn't show terms for you.
+- **Acting on reports promptly.** Apple expects objectionable content to be removed
+  within 24 hours. Someone on your team needs to watch the reports queue.
+- **Published contact information**, so users can reach you about content. Put it in
+  your app and your store listing.
+- **Store questionnaires.** Declare user-generated content in Google Play's content
+  rating questionnaire and on App Store Connect, and describe these safeguards in
+  your review notes.
+
 ## License
 
 MIT — see [LICENSE](LICENSE)

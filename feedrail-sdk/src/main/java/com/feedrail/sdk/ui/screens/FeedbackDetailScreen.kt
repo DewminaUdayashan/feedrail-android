@@ -42,6 +42,20 @@ fun FeedbackDetailScreen(
         viewModel.load(feedbackId)
     }
 
+    // Reported, or its author blocked: the post is gone for this reader.
+    LaunchedEffect(uiState.isRemoved) {
+        if (uiState.isRemoved) onBack()
+    }
+
+    val moderation = LocalModerationActions.current
+    // Shown from the host's scope: clearing the error below changes this effect's
+    // key, which cancels the effect — and a snackbar awaited in here with it.
+    LaunchedEffect(uiState.transientError) {
+        val message = uiState.transientError ?: return@LaunchedEffect
+        moderation?.showMessage(message)
+        viewModel.clearTransientError()
+    }
+
     val commentAttachmentPicker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents(),
     ) { uris: List<Uri> ->
@@ -62,6 +76,17 @@ fun FeedbackDetailScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.feedrail_general_close),
+                        )
+                    }
+                },
+                actions = {
+                    val feedback = uiState.feedback
+                    if (feedback != null) {
+                        ModerationOverflowButton(
+                            author = feedback.endUserAuthor,
+                            onReport = { reason, note ->
+                                moderation?.reportFeedback(feedback.id, reason, note)
+                            },
                         )
                     }
                 },
@@ -276,6 +301,7 @@ fun FeedbackDetailScreen(
                             CommentItem(
                                 comment = comment,
                                 baseUrl = "",
+                                feedbackId = feedback.id,
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }

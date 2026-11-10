@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.feedrail.sdk.R
+import com.feedrail.sdk.models.FeedRailBlockedUserEntry
 import com.feedrail.sdk.models.FeedRailUserProfile
 import com.feedrail.sdk.ui.components.*
 import com.feedrail.sdk.ui.viewmodels.ProfileViewModel
@@ -210,7 +211,67 @@ fun ProfileScreen(
                         }
                     }
 
+                    if (uiState.isOwnProfile) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        BlockedUsersSection(blocked = uiState.blockedUsers)
+                    }
+
                     Spacer(modifier = Modifier.height(48.dp))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Who the reader has blocked, with a way back. Blocking happens on posts and
+ * comments (other people's profiles aren't viewable), so this is the only place
+ * to undo it.
+ */
+@Composable
+private fun BlockedUsersSection(
+    blocked: List<FeedRailBlockedUserEntry>,
+    modifier: Modifier = Modifier,
+) {
+    val moderation = LocalModerationActions.current ?: return
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        Text(
+            text = stringResource(R.string.feedrail_blocked_users_title),
+            style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        if (blocked.isEmpty()) {
+            Text(
+                text = stringResource(R.string.feedrail_blocked_users_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            )
+        } else {
+            blocked.forEach { entry ->
+                val user = entry.blockedUser
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    AvatarImage(
+                        avatarUrl = user.avatarUrl,
+                        displayName = user.displayName,
+                        size = 32.dp,
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = user.displayName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = { moderation.unblock(user.id, user.displayName) }) {
+                        Text(stringResource(R.string.feedrail_unblock_action))
+                    }
                 }
             }
         }
