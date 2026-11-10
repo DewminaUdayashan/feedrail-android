@@ -32,6 +32,14 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
   all. Banned users can still read, report and block. `FeedRailError.Banned` is the
   new error case.
 - All new text is translated into the SDK's ten languages.
+### Fixed
+
+- **Submitting feedback failed with a 400.** The submit screen sent the board as
+  `boardId`, but `POST /portal/feedback` names the board by `boardSlug` and rejects
+  fields it doesn't know. So every new post was refused and the reader saw an error
+  instead of their post. The SDK now sends the selected board's slug. As far as the
+  history shows, the field has never matched the API: the API has required `boardSlug`
+  since March 2026, and the SDK has sent `boardId` since its first version.
 
 ## [0.7.3] - 2026-08-10
 

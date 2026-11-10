@@ -145,7 +145,7 @@ class SubmitFeedbackViewModel(
                         SubmitFeedbackBody(
                             title = s.title.trim(),
                             content = s.description.trim().ifEmpty { null },
-                            boardId = s.selectedBoard!!.id,
+                            boardSlug = s.selectedBoard!!.slug,
                             attachments = attachments.ifEmpty { null },
                         )
                     )
