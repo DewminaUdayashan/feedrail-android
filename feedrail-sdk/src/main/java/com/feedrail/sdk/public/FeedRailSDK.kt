@@ -98,9 +98,14 @@ object FeedRailSDK {
         )
         _authInterceptor = authInterceptor
 
+        // The library's own BuildConfig.DEBUG is false in every published AAR, so ask
+        // whether the *host app* is debuggable instead. Release builds log nothing.
+        val hostIsDebuggable =
+            (appContext.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
         val apiClient = FeedRailApiClient.create(
             baseUrl = config.environment.resolvedBaseUrl,
             authInterceptor = authInterceptor,
+            httpLogging = hostIsDebuggable,
         )
         _apiClient = apiClient
 

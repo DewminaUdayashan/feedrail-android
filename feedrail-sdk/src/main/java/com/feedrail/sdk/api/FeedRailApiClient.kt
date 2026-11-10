@@ -58,21 +58,33 @@ class FeedRailApiClient(
     companion object {
         private val errorBodyAdapter = Moshi.Builder().build().adapter(Map::class.java)
 
+        /**
+         * @param httpLogging Log requests and responses to logcat. Pass true only for a
+         *   debuggable host app: bodies carry end-user content, session tokens and, on
+         *   identify, the SDK key, and logcat is readable on rooted and debug-bridged
+         *   devices. Even then the `Authorization` header is redacted.
+         */
         fun create(
             baseUrl: String,
             authInterceptor: AuthInterceptor,
+            httpLogging: Boolean = false,
         ): FeedRailApiClient {
             val moshi = Moshi.Builder()
                 .addLast(KotlinJsonAdapterFactory())
                 .build()
 
-            val logging = HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            }
-
             val okHttp = OkHttpClient.Builder()
                 .addInterceptor(authInterceptor)
-                .addInterceptor(logging)
+                .apply {
+                    if (httpLogging) {
+                        addInterceptor(
+                            HttpLoggingInterceptor().apply {
+                                level = HttpLoggingInterceptor.Level.BODY
+                                redactHeader("Authorization")
+                            },
+                        )
+                    }
+                }
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build()
