@@ -33,6 +33,8 @@ import com.feedrail.sdk.ui.components.AvatarImage
 import com.feedrail.sdk.ui.components.BrandingHeader
 import com.feedrail.sdk.ui.components.PoweredByBadge
 import com.feedrail.sdk.ui.components.FeedRailFloatingToolbar
+import com.feedrail.sdk.ui.components.LocalModerationActions
+import com.feedrail.sdk.ui.components.ModerationActions
 import com.feedrail.sdk.ui.screens.*
 import com.feedrail.sdk.ui.theme.FeedRailTheme
 import com.feedrail.sdk.ui.viewmodels.*
@@ -179,7 +181,24 @@ fun FeedRailNavGraph(
         Modifier
     }
 
-    CompositionLocalProvider(LocalFeedRailSDK provides sdk) {
+    // Report/block confirmations outlive the screen they came from — see
+    // ModerationActions — so both the host state and the scope live here.
+    val moderationSnackbar = remember { SnackbarHostState() }
+    val moderationScope = rememberCoroutineScope()
+    val moderationActions = remember(sdk) {
+        ModerationActions(
+            api = sdk.apiClient,
+            authManager = sdk.authManager,
+            strings = sdk.languageManager,
+            scope = moderationScope,
+            snackbar = moderationSnackbar,
+        )
+    }
+
+    CompositionLocalProvider(
+        LocalFeedRailSDK provides sdk,
+        LocalModerationActions provides moderationActions,
+    ) {
         FeedRailTheme(accentColor = accentColor) {
             Surface(
                 modifier = modifier.fillMaxSize(),
@@ -348,6 +367,14 @@ fun FeedRailNavGraph(
                         )
                     }
                 }
+
+                SnackbarHost(
+                    hostState = moderationSnackbar,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .padding(bottom = if (isTabScreen) 88.dp else 72.dp),
+                )
 
                 // Overlay Toolbar
                 val isError = feedbackListState.error != null && feedbackListState.items.isEmpty()

@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">Soumettre un retour</string>
     <string name="feedrail_feedback_submit_notice_posted">Publié — votre retour se trouve désormais en haut de la liste.</string>
     <string name="feedrail_feedback_submit_notice_pending">Bien reçu — en attente de validation par l\'équipe. Vous seul pouvez le voir jusqu\'à son approbation, et il reste en haut de votre liste.</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">Plus d\'options</string>
+    <string name="feedrail_report_action">Signaler…</string>
+    <string name="feedrail_report_title">Signaler le contenu</string>
+    <string name="feedrail_report_message">Pourquoi signalez-vous ceci ? L\'équipe l\'examinera, et il est masqué pour vous immédiatement.</string>
+    <string name="feedrail_report_reason_spam">Spam</string>
+    <string name="feedrail_report_reason_harassment">Harcèlement ou intimidation</string>
+    <string name="feedrail_report_reason_hate">Discours haineux</string>
+    <string name="feedrail_report_reason_sexual">Contenu sexuel</string>
+    <string name="feedrail_report_reason_violence">Violence ou menaces</string>
+    <string name="feedrail_report_reason_other">Autre chose</string>
+    <string name="feedrail_report_note_label">Ajouter des détails (facultatif)</string>
+    <string name="feedrail_report_submit">Signaler</string>
+    <string name="feedrail_report_success">Merci pour votre signalement. L\'équipe va l\'examiner.</string>
+    <string name="feedrail_block_action">Bloquer %1$s</string>
+    <string name="feedrail_block_confirm_title">Bloquer %1$s ?</string>
+    <string name="feedrail_block_confirm_message">Vous ne verrez plus ses publications ni ses commentaires. Cette personne n\'est pas prévenue. Vous pouvez la débloquer depuis votre profil.</string>
+    <string name="feedrail_block_confirm_button">Bloquer</string>
+    <string name="feedrail_block_success">%1$s est bloqué</string>
+    <string name="feedrail_unblock_action">Débloquer</string>
+    <string name="feedrail_unblock_success">%1$s est débloqué</string>
+    <string name="feedrail_blocked_users_title">Utilisateurs bloqués</string>
+    <string name="feedrail_blocked_users_empty">Vous n\'avez bloqué personne.</string>
+    <string name="feedrail_error_banned">Vous ne pouvez plus publier ni commenter ici.</string>
 </resources>

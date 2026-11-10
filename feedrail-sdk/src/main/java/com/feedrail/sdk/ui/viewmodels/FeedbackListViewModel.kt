@@ -13,6 +13,9 @@ import com.feedrail.sdk.models.FeedRailBoard
 import com.feedrail.sdk.models.FeedRailBranding
 import com.feedrail.sdk.models.FeedRailFeedbackItem
 import com.feedrail.sdk.models.FeedRailModerationStatus
+import com.feedrail.sdk.moderation.Moderation
+import com.feedrail.sdk.moderation.ModerationEvent
+import com.feedrail.sdk.moderation.isByEndUser
 import com.feedrail.sdk.`public`.FeedRailSDK
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -80,6 +83,10 @@ class FeedbackListViewModel(
         loadBoards()
 
         viewModelScope.launch {
+            Moderation.events.collect(::onModerationEvent)
+        }
+
+        viewModelScope.launch {
             authManager.authState.collectLatest { state ->
                 _uiState.value = _uiState.value.copy(
                     isAuthenticated = state is AuthState.Authenticated,
@@ -95,6 +102,27 @@ class FeedbackListViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * Drops what the reader has just reported or blocked. The server already
+     * excludes it from later pages; this covers the rows already on screen.
+     */
+    private fun onModerationEvent(event: ModerationEvent) {
+        val items = _uiState.value.items
+        val kept = when (event) {
+            is ModerationEvent.FeedbackReported -> items.filter { it.id != event.feedbackId }
+            is ModerationEvent.UserBlocked -> items.filter { !it.isByEndUser(event.userId) }
+            // List rows carry no comments.
+            is ModerationEvent.CommentReported -> return
+            // Their posts are visible again, wherever they sort.
+            is ModerationEvent.UserUnblocked -> {
+                refresh()
+                return
+            }
+        }
+        if (justSubmitted?.let { s -> kept.none { it.id == s.id } } == true) justSubmitted = null
+        _uiState.value = _uiState.value.copy(items = kept)
     }
 
     /**

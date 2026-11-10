@@ -15,6 +15,11 @@ import com.feedrail.sdk.models.AttachmentInput
 import com.feedrail.sdk.models.FeedRailAttachment
 import com.feedrail.sdk.models.FeedRailFeedbackItem
 import com.feedrail.sdk.models.StagedAttachment
+import com.feedrail.sdk.moderation.Moderation
+import com.feedrail.sdk.moderation.ModerationEvent
+import com.feedrail.sdk.moderation.isByEndUser
+import com.feedrail.sdk.moderation.withoutComment
+import com.feedrail.sdk.moderation.withoutCommentsBy
 import com.feedrail.sdk.`public`.FeedRailSDK
 import com.feedrail.sdk.util.ImageCompressor
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +46,13 @@ data class FeedbackDetailUiState(
     val isAuthenticated: Boolean = false,
     val isAuthenticating: Boolean = false,
     val stagedAttachments: List<StagedAttachment> = emptyList(),
+    /**
+     * Set once the reader reported this post or blocked its author. The screen
+     * leaves; the API won't show the post to them again.
+     */
+    val isRemoved: Boolean = false,
+    /** A failed write's message (e.g. a banned user's comment), shown once. */
+    val transientError: String? = null,
 ) {
     /**
      * Attachments still uploading block sending — otherwise the comment would post
@@ -69,6 +81,32 @@ class FeedbackDetailViewModel(
                 )
             }
         }
+        viewModelScope.launch {
+            Moderation.events.collect(::onModerationEvent)
+        }
+    }
+
+    private fun onModerationEvent(event: ModerationEvent) {
+        val feedback = _uiState.value.feedback ?: return
+        _uiState.value = when (event) {
+            is ModerationEvent.FeedbackReported ->
+                if (event.feedbackId == feedback.id) _uiState.value.copy(isRemoved = true) else return
+            is ModerationEvent.CommentReported ->
+                if (event.feedbackId == feedback.id) {
+                    _uiState.value.copy(feedback = feedback.withoutComment(event.commentId))
+                } else return
+            is ModerationEvent.UserBlocked ->
+                if (feedback.isByEndUser(event.userId)) {
+                    _uiState.value.copy(isRemoved = true)
+                } else {
+                    _uiState.value.copy(feedback = feedback.withoutCommentsBy(event.userId))
+                }
+            is ModerationEvent.UserUnblocked -> return
+        }
+    }
+
+    fun clearTransientError() {
+        _uiState.value = _uiState.value.copy(transientError = null)
     }
 
     fun load(feedbackId: String) {
@@ -98,7 +136,7 @@ class FeedbackDetailViewModel(
                     )
                 )
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isVoting = false)
+                _uiState.value = _uiState.value.copy(isVoting = false, transientError = e.message)
             }
         }
     }
@@ -235,7 +273,10 @@ class FeedbackDetailViewModel(
             } catch (e: Exception) {
                 // Keep the text and the staged attachments so a failed send can be
                 // retried without re-picking and re-uploading everything.
-                _uiState.value = _uiState.value.copy(isSubmittingComment = false)
+                _uiState.value = _uiState.value.copy(
+                    isSubmittingComment = false,
+                    transientError = e.message,
+                )
             }
         }
     }

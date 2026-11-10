@@ -67,4 +67,29 @@
     <string name="feedrail_feedback_submit_cta">提交反馈</string>
     <string name="feedrail_feedback_submit_notice_posted">已发布，你的反馈现在位于列表顶部。</string>
     <string name="feedrail_feedback_submit_notice_pending">已收到，正在等待团队审核。通过审核前仅你可见，并会保留在列表顶部。</string>
+
+    <!-- Report & block (store UGC policy) -->
+    <string name="feedrail_moderation_more_options">更多选项</string>
+    <string name="feedrail_report_action">举报…</string>
+    <string name="feedrail_report_title">举报内容</string>
+    <string name="feedrail_report_message">你为什么要举报？团队会进行审核，此内容会立即对你隐藏。</string>
+    <string name="feedrail_report_reason_spam">垃圾信息</string>
+    <string name="feedrail_report_reason_harassment">骚扰或欺凌</string>
+    <string name="feedrail_report_reason_hate">仇恨言论</string>
+    <string name="feedrail_report_reason_sexual">色情内容</string>
+    <string name="feedrail_report_reason_violence">暴力或威胁</string>
+    <string name="feedrail_report_reason_other">其他原因</string>
+    <string name="feedrail_report_note_label">补充说明（可选）</string>
+    <string name="feedrail_report_submit">举报</string>
+    <string name="feedrail_report_success">感谢你的举报，团队会进行审核。</string>
+    <string name="feedrail_block_action">屏蔽 %1$s</string>
+    <string name="feedrail_block_confirm_title">要屏蔽 %1$s 吗？</string>
+    <string name="feedrail_block_confirm_message">你将不再看到对方的帖子和评论。对方不会收到通知。你可以在个人资料中取消屏蔽。</string>
+    <string name="feedrail_block_confirm_button">屏蔽</string>
+    <string name="feedrail_block_success">已屏蔽 %1$s</string>
+    <string name="feedrail_unblock_action">取消屏蔽</string>
+    <string name="feedrail_unblock_success">已取消屏蔽 %1$s</string>
+    <string name="feedrail_blocked_users_title">已屏蔽的用户</string>
+    <string name="feedrail_blocked_users_empty">你还没有屏蔽任何人。</string>
+    <string name="feedrail_error_banned">你已无法在此发帖或评论。</string>
 </resources>

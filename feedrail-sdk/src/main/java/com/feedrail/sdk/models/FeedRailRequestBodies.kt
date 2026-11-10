@@ -24,6 +24,14 @@ data class AddCommentBody(
     val attachments: List<AttachmentInput>? = null,
 )
 
+/** Body for reporting a post or comment. [reason] is a [FeedRailReportReason] name. */
+@JsonClass(generateAdapter = true)
+data class ReportContentBody(
+    val reason: String,
+    /** Optional free text, at most 500 characters (the API rejects longer). */
+    val note: String? = null,
+)
+
 @JsonClass(generateAdapter = true)
 data class SdkAuthBody(
     val apiKey: String,

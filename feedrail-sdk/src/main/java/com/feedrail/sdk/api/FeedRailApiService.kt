@@ -76,4 +76,29 @@ interface FeedRailApiService {
 
     @GET("api/v1/portal/profile/{userId}/activity")
     suspend fun getUserActivity(@Path("userId") userId: String): FeedRailUserActivity
+
+    // ── Report & Block ────────────────────────────────────────────────────────
+    // Allowed for banned users too: they only ever reduce what the caller sees.
+
+    @POST("api/v1/portal/feedback/{id}/report")
+    suspend fun reportFeedback(
+        @Path("id") feedbackId: String,
+        @Body body: ReportContentBody,
+    ): FeedRailReportResponse
+
+    @POST("api/v1/portal/feedback/{feedbackId}/comments/{commentId}/report")
+    suspend fun reportComment(
+        @Path("feedbackId") feedbackId: String,
+        @Path("commentId") commentId: String,
+        @Body body: ReportContentBody,
+    ): FeedRailReportResponse
+
+    @POST("api/v1/portal/users/{userId}/block")
+    suspend fun blockUser(@Path("userId") userId: String): retrofit2.Response<Unit>
+
+    @DELETE("api/v1/portal/users/{userId}/block")
+    suspend fun unblockUser(@Path("userId") userId: String): retrofit2.Response<Unit>
+
+    @GET("api/v1/portal/blocks")
+    suspend fun getBlockedUsers(): List<FeedRailBlockedUserEntry>
 }

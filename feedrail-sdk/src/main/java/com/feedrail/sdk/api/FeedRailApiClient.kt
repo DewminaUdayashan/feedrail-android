@@ -29,7 +29,7 @@ class FeedRailApiClient(
         } catch (e: HttpException) {
             when (e.code()) {
                 401 -> throw FeedRailError.Unauthorized
-                403 -> throw FeedRailError.FeatureNotAllowed
+                403 -> throw forbiddenError(e)
                 429 -> throw FeedRailError.RateLimited(
                     e.response()?.headers()?.get("Retry-After")?.toIntOrNull()
                 )
@@ -40,7 +40,24 @@ class FeedRailApiClient(
         }
     }
 
+    /**
+     * A 403 is either a plan gate or a banned user. Only the body tells them apart,
+     * and a banned user deserves to be told why their comment didn't post rather
+     * than that the feature is "not on your plan".
+     */
+    private fun forbiddenError(e: HttpException): FeedRailError {
+        val body = runCatching { e.response()?.errorBody()?.string() }.getOrNull()
+        val json = body?.let { runCatching { errorBodyAdapter.fromJson(it) }.getOrNull() }
+        return if (json?.get("errorCode") == FeedRailError.END_USER_BANNED) {
+            FeedRailError.Banned((json["message"] as? String)?.ifBlank { null })
+        } else {
+            FeedRailError.FeatureNotAllowed
+        }
+    }
+
     companion object {
+        private val errorBodyAdapter = Moshi.Builder().build().adapter(Map::class.java)
+
         fun create(
             baseUrl: String,
             authInterceptor: AuthInterceptor,
