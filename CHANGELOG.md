@@ -12,6 +12,8 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-10
+
 ### Added
 
 - **Report and block, for App Store Guideline 1.2 and Google Play's UGC policy.**
