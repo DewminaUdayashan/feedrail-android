@@ -48,10 +48,12 @@ fun FeedbackDetailScreen(
     }
 
     val moderation = LocalModerationActions.current
+    // Shown from the host's scope: clearing the error below changes this effect's
+    // key, which cancels the effect — and a snackbar awaited in here with it.
     LaunchedEffect(uiState.transientError) {
         val message = uiState.transientError ?: return@LaunchedEffect
+        moderation?.showMessage(message)
         viewModel.clearTransientError()
-        moderation?.snackbar?.showSnackbar(message)
     }
 
     val commentAttachmentPicker = rememberLauncherForActivityResult(

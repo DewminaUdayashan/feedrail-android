@@ -95,6 +95,14 @@ class ModerationActions internal constructor(
             Moderation.unblockUser(api, userId)
         }
 
+    /**
+     * Shows [message] in the host's snackbar from the host's own scope, so the caller
+     * can clear whatever state produced it without cancelling the snackbar.
+     */
+    internal fun showMessage(message: String) {
+        scope.launch { snackbar.showSnackbar(message) }
+    }
+
     private fun run(successMessage: String, block: suspend () -> Unit) {
         scope.launch {
             val message = try {
