@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.feedrail"
-version = "0.7.3"
+version = "0.8.0"
 
 android {
     namespace = "com.feedrail.sdk"
