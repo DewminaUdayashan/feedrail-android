@@ -12,6 +12,27 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-11
+
+### Fixed
+
+- **The feed failed to load in apps that minify with R8.** The SDK shipped an empty
+  `consumer-rules.pro`, so R8 stripped the Kotlin metadata and model members that
+  Moshi's reflective adapter and Retrofit read at runtime. Debug builds worked and
+  release builds showed "Failed to Load" with a `ClassCastException` in logcat. The
+  AAR now carries keep rules for its models, its Retrofit interface, Moshi's
+  generated adapters and Kotlin metadata, so host apps need no FeedRail rules of
+  their own. Apps that added such rules as a workaround can remove them.
+
+### Security
+
+- **HTTP traffic is no longer logged in release builds.** Every request and response,
+  bodies included, went to logcat at `BODY` level in every build, which exposed
+  session tokens, end-user content and, on identify, the SDK key. Logging is now on
+  only when the host app is debuggable (`FLAG_DEBUGGABLE`, since the library's own
+  `BuildConfig.DEBUG` is false in every published AAR), and even then the
+  `Authorization` header is redacted.
+
 ## [0.8.0] - 2026-11-10
 
 ### Added
