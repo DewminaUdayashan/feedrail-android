@@ -12,6 +12,27 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+### Added
+
+- **Report and block, for App Store Guideline 1.2 and Google Play's UGC policy.**
+  Other end users' posts and comments now carry **Report…** and **Block <name>**: from
+  the ⋮ menu on a post's detail screen and on each comment, and by long-pressing a
+  post in the feed. Reporting asks for a reason (spam, harassment, hate, sexual
+  content, violence, other) and an optional note, then confirms in a snackbar;
+  blocking asks for confirmation first. Neither is offered on team posts, team or AI
+  comments, or the reader's own content.
+- Reported content, and everything by a blocked author, disappears from the screen
+  immediately, including the feed underneath the detail screen. Reporting a post or
+  blocking its author from that post's detail screen returns to the feed. The API
+  keeps it hidden on every later fetch.
+- **Blocked users** on the reader's own profile, with **Unblock**. Other people's
+  profiles can't be opened, so this is where a block is undone.
+- A user the team has banned now sees "You can no longer post or comment here." when
+  a post, comment or vote is refused, instead of a generic plan error or nothing at
+  all. Banned users can still read, report and block. `FeedRailError.Banned` is the
+  new error case.
+- All new text is translated into the SDK's ten languages.
+
 ## [0.7.3] - 2026-08-10
 
 ### Fixed
