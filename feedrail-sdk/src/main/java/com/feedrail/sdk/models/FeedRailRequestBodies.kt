@@ -6,7 +6,8 @@ import com.squareup.moshi.JsonClass
 data class SubmitFeedbackBody(
     val title: String,
     val content: String?,
-    val boardId: String,
+    /** The board's slug. The API identifies boards by slug here and rejects a `boardId`. */
+    val boardSlug: String,
     val attachments: List<AttachmentInput>? = null,
 )
 
