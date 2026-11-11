@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">提交回饋</string>
     <string name="feedrail_submit_title_placeholder">簡短描述性標題</string>
     <string name="feedrail_submit_title_label">標題</string>
-    <string name="feedrail_submit_board_label">板塊</string>
+    <string name="feedrail_submit_board_label">這是關於什麼的？</string>
     <string name="feedrail_submit_board_placeholder">選擇板塊</string>
     <string name="feedrail_submit_description_label">描述</string>
     <string name="feedrail_submit_description_placeholder">詳細描述您的想法或問題…</string>

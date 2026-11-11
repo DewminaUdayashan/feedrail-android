@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">Invia feedback</string>
     <string name="feedrail_submit_title_placeholder">Titolo breve e descrittivo</string>
     <string name="feedrail_submit_title_label">Titolo</string>
-    <string name="feedrail_submit_board_label">Board</string>
+    <string name="feedrail_submit_board_label">Di cosa si tratta?</string>
     <string name="feedrail_submit_board_placeholder">Seleziona un board</string>
     <string name="feedrail_submit_description_label">Descrizione</string>
     <string name="feedrail_submit_description_placeholder">Descrivi la tua idea o il problema…</string>

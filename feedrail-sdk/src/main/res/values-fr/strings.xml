@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">Soumettre un retour</string>
     <string name="feedrail_submit_title_placeholder">Titre court et descriptif</string>
     <string name="feedrail_submit_title_label">Titre</string>
-    <string name="feedrail_submit_board_label">Tableau</string>
+    <string name="feedrail_submit_board_label">De quoi s\'agit-il ?</string>
     <string name="feedrail_submit_board_placeholder">Sélectionner un tableau</string>
     <string name="feedrail_submit_description_label">Description</string>
     <string name="feedrail_submit_description_placeholder">Décrivez votre idée ou problème…</string>

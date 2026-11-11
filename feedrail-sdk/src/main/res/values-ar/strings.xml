@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">إرسال تعليق</string>
     <string name="feedrail_submit_title_placeholder">عنوان قصير ووصفي</string>
     <string name="feedrail_submit_title_label">العنوان</string>
-    <string name="feedrail_submit_board_label">اللوحة</string>
+    <string name="feedrail_submit_board_label">ما موضوع ملاحظتك؟</string>
     <string name="feedrail_submit_board_placeholder">اختر لوحة</string>
     <string name="feedrail_submit_description_label">الوصف</string>
     <string name="feedrail_submit_description_placeholder">صف فكرتك أو مشكلتك…</string>

@@ -65,7 +65,10 @@ class SubmitFeedbackViewModel(
     fun setBoards(boards: List<FeedRailBoard>) {
         _uiState.value = _uiState.value.copy(
             boards = boards,
-            selectedBoard = if (boards.size == 1) boards.first() else _uiState.value.selectedBoard,
+            // Preselect the first board (as iOS does), so the form is never stuck with
+            // Submit disabled for a reason the user can't see.
+            selectedBoard = _uiState.value.selectedBoard?.takeIf { sel -> boards.any { it.id == sel.id } }
+                ?: boards.firstOrNull(),
         )
     }
 

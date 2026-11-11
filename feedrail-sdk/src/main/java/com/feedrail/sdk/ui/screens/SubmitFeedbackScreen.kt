@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.Color
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +18,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,7 +50,7 @@ fun SubmitFeedbackScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    var showBoardMenu by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     LaunchedEffect(boards) {
         viewModel.setBoards(boards)
@@ -91,6 +100,12 @@ fun SubmitFeedbackScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
+                .consumeWindowInsets(paddingValues)
+                // Hosts are usually edge-to-edge, where adjustResize no longer shrinks
+                // the window; without this the keyboard covers the submit button.
+                .imePadding()
+                // Tapping anywhere outside a field dismisses the keyboard.
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -103,6 +118,10 @@ fun SubmitFeedbackScreen(
                 placeholder = { Text(stringResource(R.string.feedrail_submit_title_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next,
+                ),
                 isError = uiState.title.isBlank() && uiState.error != null,
                 shape = MaterialTheme.shapes.large,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -114,86 +133,48 @@ fun SubmitFeedbackScreen(
                 } else null,
             )
 
-            // Board selection (Custom Surface instead of Dropdown)
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    text = stringResource(R.string.feedrail_submit_board_label),
-                    style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Box {
-                    Surface(
-                        onClick = { showBoardMenu = true },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-                        color = MaterialTheme.colorScheme.surface
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            val selectedBoard = uiState.selectedBoard
-                            if (selectedBoard != null) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Surface(
-                                        modifier = Modifier.size(12.dp),
-                                        shape = CircleShape,
-                                        color = Color(android.graphics.Color.parseColor(selectedBoard.color ?: "#CCCCCC"))
-                                    ) {}
-                                    Spacer(modifier = Modifier.width(12.dp))
-                                    Text(
-                                        text = selectedBoard.name,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                }
-                            } else {
-                                Text(
-                                    text = stringResource(R.string.feedrail_submit_board_placeholder),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = showBoardMenu,
-                        onDismissRequest = { showBoardMenu = false },
-                        modifier = Modifier.fillMaxWidth(0.9f) // Allow it to be wide
+            // Board selection: every board as a chip, all visible at once. People
+            // don't know what a "board" is, but they recognise "Bug Reports" vs
+            // "Feature Requests" when they see them side by side. Hidden when there
+            // is only one board, since the view model picks it automatically.
+            if (uiState.boards.size > 1) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.feedrail_submit_board_label),
+                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth().selectableGroup(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         uiState.boards.forEach { board ->
                             val isSelected = uiState.selectedBoard?.id == board.id
-                            DropdownMenuItem(
-                                text = {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Surface(
-                                            modifier = Modifier.size(12.dp),
-                                            shape = CircleShape,
-                                            color = Color(android.graphics.Color.parseColor(board.color ?: "#CCCCCC"))
-                                        ) {}
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Text(
-                                            text = board.name,
-                                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            FilterChip(
+                                selected = isSelected,
+                                onClick = {
+                                    focusManager.clearFocus()
+                                    viewModel.selectBoard(board)
+                                },
+                                label = { Text(board.name) },
+                                leadingIcon = {
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
+                                    } else {
+                                        Surface(
+                                            modifier = Modifier.size(10.dp),
+                                            shape = CircleShape,
+                                            color = board.color.toComposeColor(),
+                                        ) {}
                                     }
                                 },
-                                onClick = {
-                                    viewModel.selectBoard(board)
-                                    showBoardMenu = false
-                                },
-                                trailingIcon = if (isSelected) {
-                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                } else null
+                                shape = MaterialTheme.shapes.medium,
+                                modifier = Modifier.semantics { role = Role.RadioButton },
                             )
                         }
                     }
@@ -211,6 +192,7 @@ fun SubmitFeedbackScreen(
                     .height(160.dp),
                 minLines = 4,
                 maxLines = 10,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 shape = MaterialTheme.shapes.large,
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
@@ -331,7 +313,10 @@ fun SubmitFeedbackScreen(
 
             // Submit button
             Button(
-                onClick = { viewModel.submit(onSuccess) },
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.submit(onSuccess)
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
@@ -357,3 +342,7 @@ fun SubmitFeedbackScreen(
         }
     }
 }
+
+private fun String?.toComposeColor(): Color =
+    runCatching { Color(android.graphics.Color.parseColor(this ?: "#CCCCCC")) }
+        .getOrDefault(Color(0xFFCCCCCC))

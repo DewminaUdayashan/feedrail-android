@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">フィードバックを送信</string>
     <string name="feedrail_submit_title_placeholder">短くてわかりやすいタイトル</string>
     <string name="feedrail_submit_title_label">タイトル</string>
-    <string name="feedrail_submit_board_label">ボード</string>
+    <string name="feedrail_submit_board_label">どんな内容ですか？</string>
     <string name="feedrail_submit_board_placeholder">ボードを選択</string>
     <string name="feedrail_submit_description_label">説明</string>
     <string name="feedrail_submit_description_placeholder">アイデアや問題を詳しく説明してください…</string>

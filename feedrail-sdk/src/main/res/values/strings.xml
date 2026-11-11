@@ -59,7 +59,7 @@
     <string name="feedrail_submit_title">Submit Feedback</string>
     <string name="feedrail_submit_title_placeholder">Short, descriptive title</string>
     <string name="feedrail_submit_title_label">Title</string>
-    <string name="feedrail_submit_board_label">Board</string>
+    <string name="feedrail_submit_board_label">What\'s this about?</string>
     <string name="feedrail_submit_board_placeholder">Select a board</string>
     <string name="feedrail_submit_description_label">Description</string>
     <string name="feedrail_submit_description_placeholder">Describe your idea or issue in detail…</string>

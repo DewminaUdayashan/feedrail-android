@@ -37,7 +37,7 @@
     <string name="feedrail_submit_title">Enviar comentario</string>
     <string name="feedrail_submit_title_placeholder">Título corto y descriptivo</string>
     <string name="feedrail_submit_title_label">Título</string>
-    <string name="feedrail_submit_board_label">Tablero</string>
+    <string name="feedrail_submit_board_label">¿De qué se trata?</string>
     <string name="feedrail_submit_board_placeholder">Seleccionar tablero</string>
     <string name="feedrail_submit_description_label">Descripción</string>
     <string name="feedrail_submit_description_placeholder">Describe tu idea o problema…</string>
