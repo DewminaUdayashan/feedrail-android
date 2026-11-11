@@ -12,6 +12,23 @@ name. Each released version is tagged on its `release/vX.Y` branch, never on tru
 
 ## [Unreleased]
 
+## [0.8.2] - 2026-11-11
+
+### Changed
+
+- **The submit form shows boards as chips instead of a dropdown.** Every board is
+  visible at once as a selectable chip, under the label "What's this about?" rather
+  than "Board", which people did not understand. The first board is preselected, as
+  on iOS, so Submit is never disabled for a reason the user cannot see. The section
+  is hidden when the project has only one board.
+
+### Fixed
+
+- **The keyboard covered the Submit button.** In edge-to-edge host apps
+  `adjustResize` no longer shrinks the window, so the form could not scroll past the
+  keyboard. The form now pads for the IME, and tapping outside a field dismisses the
+  keyboard. The title field's action key moves to the description.
+
 ## [0.8.1] - 2026-11-11
 
 ### Fixed
